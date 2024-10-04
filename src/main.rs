@@ -58,6 +58,7 @@ fn main() -> anyhow::Result<()> {
         device.synchronize()?;
     }
 
+    println!("Creating graph");
     /////  CREATING THE GRAPH
     let mut cu_graph: cudarc::driver::sys::CUgraph = unsafe {
         let mut cu_graph = std::mem::MaybeUninit::uninit();
@@ -68,16 +69,6 @@ fn main() -> anyhow::Result<()> {
     };
 
     println!("Created graph");
-
-    // unsafe {
-    //     let mut node = std::mem::MaybeUninit::uninit();
-    //     cudarc::driver::sys::lib()
-    //         .cuGraphAddEmptyNode(node.as_mut_ptr(), cu_graph, ptr::null(), 0)
-    //         .result()?;
-    //     cudarc::driver::sys::lib()
-    //         .cuGraphAddMemcpyNode(node.as_mut_ptr(), cu_graph, ptr::null(), 0)
-    //         .result()?;
-    // }
 
     let x = Tensor::ones((4, 4), DType::BF16, &device)?;
     let mut y: Option<Tensor> = None;
@@ -91,15 +82,15 @@ fn main() -> anyhow::Result<()> {
                 ptr::null(),
                 ptr::null(),
                 0,
-                cudarc::driver::sys::CUstreamCaptureMode_enum::CU_STREAM_CAPTURE_MODE_RELAXED, //:CU_STREAM_CAPTURE_MODE_THREAD_LOCAL,
+                cudarc::driver::sys::CUstreamCaptureMode_enum::CU_STREAM_CAPTURE_MODE_RELAXED, //CU_STREAM_CAPTURE_MODE_THREAD_LOCAL,
             )
             .result()?
     }
+
     println!("Begin capture");
     {
-        let x_tmp = x.clone();
-        let out_data = x_tmp.log()?;
-        //y = Some(out_data.clone());
+        let out_data = x.log()?;
+        y = Some(out_data);
     };
     println!("Done with ops");
 
@@ -113,8 +104,9 @@ fn main() -> anyhow::Result<()> {
     /////  CREATING THE GRAPH EXECUTOR
     let cu_graph_e: cudarc::driver::sys::CUgraphExec = unsafe {
         let mut cu_graph_e = std::mem::MaybeUninit::uninit();
+        // https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp#L166-L176
         cudarc::driver::sys::lib()
-            .cuGraphInstantiateWithFlags(cu_graph_e.as_mut_ptr(), cu_graph, 0)
+            .cuGraphInstantiateWithFlags(cu_graph_e.as_mut_ptr(), cu_graph, cudarc::driver::sys::CUgraphInstantiate_flags::CUDA_GRAPH_INSTANTIATE_FLAG_AUTO_FREE_ON_LAUNCH as u64)
             .result()?;
         cu_graph_e.assume_init()
     };
