@@ -310,9 +310,11 @@ impl Graph {
         verbosity: GraphDumpVerbosity,
     ) -> anyhow::Result<()> {
         let tmp = if let GraphDumpFormat::Dot = format {
-            out.as_ref().to_string_lossy().to_string()
+            out.as_ref().to_string_lossy().trim().to_string()
         } else {
             format!("{}/candle-graph-dump.dot", std::env::temp_dir().display())
+                .trim()
+                .to_string()
         };
         let verbosity = match verbosity {
             GraphDumpVerbosity::Verbose => {
@@ -328,14 +330,18 @@ impl Graph {
             )
         }
         .result()?;
-        match format {
-            GraphDumpFormat::Png | GraphDumpFormat::Svg => {
-                let command = Command::new("dot").arg("-Tpng").arg(tmp).output()?.stdout;
-                std::fs::write(out, command)?;
-                Ok(())
-            }
-            GraphDumpFormat::Dot => Ok(()),
-        }
+        let ty = match format {
+            GraphDumpFormat::Png => "png",
+            GraphDumpFormat::Svg => "svg",
+            GraphDumpFormat::Dot => return Ok(()),
+        };
+        let command = Command::new("dot")
+            .arg(format!("-T{ty}"))
+            .arg(tmp)
+            .output()?
+            .stdout;
+        std::fs::write(out, command)?;
+        Ok(())
     }
 }
 
