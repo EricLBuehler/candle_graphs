@@ -129,6 +129,9 @@ pub struct Graph {
 }
 
 impl Graph {
+    /// Initialize a CUDA graph, executing the closure to capture a graph.
+    ///
+    /// The input tensors provided must all be contiguous.
     pub fn new(
         from_code: impl FnOnce() -> anyhow::Result<()>,
         device: &Device,
@@ -245,6 +248,12 @@ impl Graph {
             cu_graph_e.assume_init()
         };
 
+        for (name, input) in &input_tensors {
+            if !input.is_contiguous() {
+                anyhow::bail!("Input {name} is not contiguous");
+            }
+        }
+
         Ok(Self {
             graph: cu_graph,
             exec: cu_graph_e,
@@ -254,12 +263,22 @@ impl Graph {
         })
     }
 
-    /// Run the graph
+    /// Execute the graph with the provided inputs.
+    ///
+    /// All inputs are copied, so it may be detrimental to performance if large
+    /// inputs are provided.
+    ///
+    /// # Panics
+    /// - The inputs provided here must match the inputs provided upon construction.
+    /// - The inputs provided here must all be continuous
     pub fn replay(&self, input_tensors: HashMap<&'static str, &Tensor>) -> anyhow::Result<()> {
         let mut added = HashSet::new();
         for (name, input) in &input_tensors {
             if !added.insert(name) {
                 panic!("Got duplicate inputs {name}");
+            }
+            if !input.is_contiguous() {
+                panic!("Input {name} is not contiguous");
             }
             if let Some(inp_ref) = self.input_tensors.get(name) {
                 unsafe { copy_inplace(input, inp_ref, &self.device)? };
