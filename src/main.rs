@@ -1,8 +1,42 @@
-use std::{process::Command, time::Instant};
+use std::{f64::consts::E, process::Command, ptr};
 
-use candle_core::{cuda::cudarc, DType, Device, Tensor};
+use candle_core::{
+    cuda::cudarc::{
+        self,
+        driver::{DevicePtr, DeviceSlice},
+    },
+    DType, Device, Storage, Tensor,
+};
+use half::bf16;
 
-const USE_CUDA_GRAPH: bool = true;
+/// # Safety
+/// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
+unsafe fn copy_into(src: &Tensor, dst: &Tensor, device: &Device) -> anyhow::Result<()> {
+    match (&*src.storage_and_layout().0, &*dst.storage_and_layout().0) {
+        (Storage::Cuda(src), Storage::Cuda(tgt)) => {
+            // What we are really doing:
+
+            // unsafe fn cast_to_mut<T>(r: &T) -> &mut T {
+            //     // Cast immutable reference to mutable reference
+            //     #[allow(invalid_reference_casting)]
+            //     &mut *(r as *const T as *mut T)
+            // }
+            // let dst = unsafe { cast_to_mut(tgt.as_cuda_slice::<bf16>()?) };
+            // cu_device.dtod_copy(src, dst)?;
+
+            let tgt = tgt.as_cuda_slice::<bf16>()?;
+            let src = src.as_cuda_slice::<bf16>()?;
+            cudarc::driver::result::memcpy_dtod_sync(
+                *tgt.device_ptr(),
+                *src.device_ptr(),
+                src.len() * std::mem::size_of::<bf16>(),
+            )?;
+            device.synchronize()?;
+        }
+        _ => unreachable!(),
+    }
+    Ok(())
+}
 
 fn main() -> anyhow::Result<()> {
     let device = Device::new_cuda_with_stream(0)?;
@@ -23,52 +57,89 @@ fn main() -> anyhow::Result<()> {
         x.matmul(&x)?;
         device.synchronize()?;
     }
-    if USE_CUDA_GRAPH {
-        unsafe {
-            cudarc::driver::sys::lib()
-            .cuStreamBeginCapture_v2(
+
+    /////  CREATING THE GRAPH
+    let mut cu_graph: cudarc::driver::sys::CUgraph = unsafe {
+        let mut cu_graph = std::mem::MaybeUninit::uninit();
+        cudarc::driver::sys::lib()
+            .cuGraphCreate(cu_graph.as_mut_ptr(), 0)
+            .result()?;
+        cu_graph.assume_init()
+    };
+
+    println!("Created graph");
+
+    // unsafe {
+    //     let mut node = std::mem::MaybeUninit::uninit();
+    //     cudarc::driver::sys::lib()
+    //         .cuGraphAddEmptyNode(node.as_mut_ptr(), cu_graph, ptr::null(), 0)
+    //         .result()?;
+    //     cudarc::driver::sys::lib()
+    //         .cuGraphAddMemcpyNode(node.as_mut_ptr(), cu_graph, ptr::null(), 0)
+    //         .result()?;
+    // }
+
+    let x = Tensor::ones((4, 4), DType::BF16, &device)?;
+    let mut y: Option<Tensor> = None;
+
+    /////  START CAPTURE INTO THE GRAPH
+    unsafe {
+        cudarc::driver::sys::lib()
+            .cuStreamBeginCaptureToGraph(
                 *cu_stream,
-                cudarc::driver::sys::CUstreamCaptureMode_enum::CU_STREAM_CAPTURE_MODE_THREAD_LOCAL,
+                cu_graph,
+                ptr::null(),
+                ptr::null(),
+                0,
+                cudarc::driver::sys::CUstreamCaptureMode_enum::CU_STREAM_CAPTURE_MODE_RELAXED, //:CU_STREAM_CAPTURE_MODE_THREAD_LOCAL,
             )
             .result()?
-        }
     }
-    let mut out_data = Tensor::zeros((32, 32), DType::BF16, &device)?;
+    println!("Begin capture");
     {
-        let x = Tensor::ones((32, 32), DType::BF16, &device)?;
-        let y = Tensor::ones((32, 32), DType::BF16, &device)?;
-        out_data = (x.silu()? + &y.gelu()?)?;
+        let x_tmp = x.clone();
+        let out_data = x_tmp.log()?;
+        //y = Some(out_data.clone());
+    };
+    println!("Done with ops");
+
+    /////  END CAPTURE AND WRITE TO THE GRAPH
+    unsafe {
+        cudarc::driver::sys::lib()
+            .cuStreamEndCapture(*cu_stream, &mut cu_graph as *mut _)
+            .result()?;
     }
-    if USE_CUDA_GRAPH {
-        let cu_graph: cudarc::driver::sys::CUgraph = unsafe {
-            let mut cu_graph = std::mem::MaybeUninit::uninit();
-            cudarc::driver::sys::lib()
-                .cuStreamEndCapture(*cu_stream, cu_graph.as_mut_ptr())
-                .result()?;
-            cu_graph.assume_init()
-        };
-        let cu_graph_e: cudarc::driver::sys::CUgraphExec = unsafe {
-            let mut cu_graph_e = std::mem::MaybeUninit::uninit();
-            cudarc::driver::sys::lib()
-                .cuGraphInstantiateWithFlags(cu_graph_e.as_mut_ptr(), cu_graph, 0)
-                .result()?;
-            cu_graph_e.assume_init()
-        };
 
-        println!("graph captured!");
-        let start = Instant::now();
+    /////  CREATING THE GRAPH EXECUTOR
+    let cu_graph_e: cudarc::driver::sys::CUgraphExec = unsafe {
+        let mut cu_graph_e = std::mem::MaybeUninit::uninit();
+        cudarc::driver::sys::lib()
+            .cuGraphInstantiateWithFlags(cu_graph_e.as_mut_ptr(), cu_graph, 0)
+            .result()?;
+        cu_graph_e.assume_init()
+    };
 
-        let out = String::from("out.dot");
-        unsafe {
-            cudarc::driver::sys::lib().cuGraphDebugDotPrint(cu_graph, out.as_ptr() as *const i8, 0)
-        }
-        .result()?;
-        let command = Command::new("dot")
-            .arg("-Tpng")
-            .arg("out.dot")
-            .output()?
-            .stdout;
-        std::fs::write("out.png", command)?;
+    println!("graph captured!");
+
+    let out = String::from("out.dot");
+    unsafe {
+        cudarc::driver::sys::lib().cuGraphDebugDotPrint(cu_graph, out.as_ptr() as *const i8, 0)
+    }
+    .result()?;
+    let command = Command::new("dot")
+        .arg("-Tpng")
+        .arg("out.dot")
+        .output()?
+        .stdout;
+    std::fs::write("out.png", command)?;
+
+    for i in 1..=10 {
+        println!("{} Exec {i} {}", "=".repeat(10), "=".repeat(10));
+        let new = Tensor::full(E.powi(i), (4, 4), &device)?.to_dtype(DType::BF16)?;
+
+        unsafe { copy_into(&new, &x, &device)? };
+
+        println!("x {x}");
 
         println!("graph exec");
         unsafe {
@@ -80,23 +151,10 @@ fn main() -> anyhow::Result<()> {
         device.synchronize()?;
         println!("done syncing");
 
-        println!("{out_data}");
-
-        dbg!(&Instant::now().duration_since(start).as_secs_f64());
-    } else {
-        let start = Instant::now();
-        let _u = Tensor::zeros((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        let mut x = Tensor::zeros((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        let _v = Tensor::zeros((4096, 1), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        for i in 0..100 * 100 {
-            println!("exec {i}");
-            // x.slice_set(&u, 0, 0)?;
-            // x.broadcast_add(&v)?;
-            x = x.matmul(&x)?;
-            // x = (&u + &x)?;
+        if let Some(y) = &y {
+            println!("out {y}");
         }
-        dbg!(&Instant::now().duration_since(start).as_secs_f64());
-        device.synchronize()?;
     }
+
     Ok(())
 }

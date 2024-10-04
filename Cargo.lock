@@ -169,6 +169,7 @@ dependencies = [
  "anyhow",
  "candle-core",
  "candle-nn",
+ "half",
 ]
 
 [[package]]
