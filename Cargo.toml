@@ -1,0 +1,8 @@
+[package]
+name = "cuda_graph"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.89"
+candle-core = { git = "https://github.com/huggingface/candle.git", version = "0.7.2", features = ["cuda"] }
