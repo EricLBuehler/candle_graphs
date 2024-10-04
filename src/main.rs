@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{process::Command, time::Instant};
 
 use candle_core::{cuda::cudarc, DType, Device, Tensor};
 
@@ -33,16 +33,11 @@ fn main() -> anyhow::Result<()> {
             .result()?
         }
     }
+    let mut out_data = Tensor::zeros((32, 32), DType::BF16, &device)?;
     {
-        let _u = Tensor::zeros((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        let mut x = Tensor::ones((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        let _v = Tensor::zeros((4096, 1), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        for _i in 0..100 {
-            // x.slice_set(&u, 0, 0)?;
-            // x.broadcast_add(&v)?;
-            x = x.matmul(&x)?;
-            // x = (&u + &x)?;
-        }
+        let x = Tensor::ones((32, 32), DType::BF16, &device)?;
+        let y = Tensor::ones((32, 32), DType::BF16, &device)?;
+        out_data = (x.silu()? + &y.gelu()?)?;
     }
     if USE_CUDA_GRAPH {
         let cu_graph: cudarc::driver::sys::CUgraph = unsafe {
@@ -62,24 +57,38 @@ fn main() -> anyhow::Result<()> {
 
         println!("graph captured!");
         let start = Instant::now();
-        for i in 1..100 {
-            println!("graph exec {i}");
-            unsafe {
-                cudarc::driver::sys::lib()
-                    .cuGraphLaunch(cu_graph_e, *cu_stream)
-                    .result()?
-            }
-            println!("sync");
-            device.synchronize()?;
-            println!("done syncing");
+
+        let out = String::from("out.dot");
+        unsafe {
+            cudarc::driver::sys::lib().cuGraphDebugDotPrint(cu_graph, out.as_ptr() as *const i8, 0)
         }
+        .result()?;
+        let command = Command::new("dot")
+            .arg("-Tpng")
+            .arg("out.dot")
+            .output()?
+            .stdout;
+        std::fs::write("out.png", command)?;
+
+        println!("graph exec");
+        unsafe {
+            cudarc::driver::sys::lib()
+                .cuGraphLaunch(cu_graph_e, *cu_stream)
+                .result()?
+        }
+        println!("sync");
+        device.synchronize()?;
+        println!("done syncing");
+
+        println!("{out_data}");
+
         dbg!(&Instant::now().duration_since(start).as_secs_f64());
     } else {
         let start = Instant::now();
         let _u = Tensor::zeros((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
         let mut x = Tensor::zeros((4096, 4096), DType::F32, &device)?.to_dtype(DType::BF16)?;
         let _v = Tensor::zeros((4096, 1), DType::F32, &device)?.to_dtype(DType::BF16)?;
-        for i in 0..100*100 {
+        for i in 0..100 * 100 {
             println!("exec {i}");
             // x.slice_set(&u, 0, 0)?;
             // x.broadcast_add(&v)?;
