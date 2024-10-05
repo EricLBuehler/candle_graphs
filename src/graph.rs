@@ -16,6 +16,7 @@ use half::{bf16, f16};
 use std::{
     cell::Cell,
     collections::{HashMap, HashSet},
+    ffi::CString,
     marker::PhantomData,
     mem::MaybeUninit,
     path::Path,
@@ -325,20 +326,15 @@ impl Graph {
         } else {
             format!("{}.dot", out.as_ref().display())
         };
+        let cstr = unsafe { CString::from_vec_unchecked(tmp.as_bytes().to_vec()) };
         let verbosity = match verbosity {
             GraphDumpVerbosity::Verbose => {
                 CUgraphDebugDot_flags::CU_GRAPH_DEBUG_DOT_FLAGS_VERBOSE as u32
             }
             GraphDumpVerbosity::Clean => 0,
         };
-        unsafe {
-            driver::sys::lib().cuGraphDebugDotPrint(
-                self.graph,
-                tmp.as_ptr() as *const i8,
-                verbosity,
-            )
-        }
-        .result()?;
+        unsafe { driver::sys::lib().cuGraphDebugDotPrint(self.graph, cstr.as_ptr(), verbosity) }
+            .result()?;
         let ty = match format {
             GraphDumpFormat::Png => "png",
             GraphDumpFormat::Svg => "svg",
