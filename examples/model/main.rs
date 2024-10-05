@@ -10,8 +10,13 @@ use candle_core::{DType, Device, Tensor};
 
 const IN_DIM: usize = 8;
 const HIDDEN_DIM: usize = 64;
-const N_HIDDEN: usize = 32;
 const OUT_DIM: usize = 8;
+
+// 2.5-3.5x speedup
+// const N_HIDDEN: usize = 32;
+
+// 1.5-2.5x speedup
+const N_HIDDEN: usize = 12;
 
 const BENCH_N: usize = 100;
 
