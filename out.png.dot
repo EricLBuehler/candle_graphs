@@ -3,14 +3,14 @@ subgraph cluster_1 {
 label="graph_1" graph[style="dashed"];
 "graph_1_node_0"[style="solid" shape="record" label="{
 MEM_ALLOC
-| {{ID | node handle} | {0 (topoId: 5) | 0x0000561F4780DDC0}}
+| {{ID | node handle} | {0 (topoId: 137) | 0x00005633705A9D50}}
 | {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
 | {{bytesize | dptr} | {128 | 0x0000001A00000000}}
 }"];
 
 "graph_1_node_1"[style="bold" shape="record" label="{KERNEL
-| {ID | 1 (topoId: 4) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb1ELb1ELb1ELb0ELi7ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXT5_EvE4typeET11_\<\<\<1,\{2,64\},784\>\>\>}
-| {{node handle | func handle} | {0x0000561F4E092040 | 0x0000561F4DB39C50}}
+| {ID | 1 (topoId: 136) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb1ELb1ELb1ELb0ELi7ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXT5_EvE4typeET11_\<\<\<1,\{2,64\},784\>\>\>}
+| {{node handle | func handle} | {0x0000563376E2DFE0 | 0x00005633768D5BF0}}
 | {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
 | {cooperative | 0}
 | {priority | 0}
@@ -18,14 +18,14 @@ MEM_ALLOC
 
 "graph_1_node_2"[style="solid" shape="record" label="{
 MEM_ALLOC
-| {{ID | node handle} | {2 (topoId: 3) | 0x0000561F4E2488C0}}
+| {{ID | node handle} | {2 (topoId: 135) | 0x00005633771ED0E0}}
 | {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
 | {{bytesize | dptr} | {128 | 0x0000001A00000200}}
 }"];
 
 "graph_1_node_3"[style="bold" shape="record" label="{KERNEL
-| {ID | 3 (topoId: 2) | urelu_bf16\<\<\<1,1024,0\>\>\>}
-| {{node handle | func handle} | {0x0000561F4E249150 | 0x0000561F4E4CDBA0}}
+| {ID | 3 (topoId: 134) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x00005633771ED970 | 0x00005633774A5A60}}
 | {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
 | {cooperative | 0}
 | {priority | 0}
@@ -33,14 +33,1004 @@ MEM_ALLOC
 
 "graph_1_node_4"[style="solid" shape="record" label="{
 MEM_ALLOC
-| {{ID | node handle} | {4 (topoId: 1) | 0x0000561F4E249B30}}
+| {{ID | node handle} | {4 (topoId: 133) | 0x0000563376E2FFE0}}
 | {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
-| {{bytesize | dptr} | {16 | 0x0000001A00000400}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000400}}
 }"];
 
 "graph_1_node_5"[style="bold" shape="record" label="{KERNEL
-| {ID | 5 (topoId: 0) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<2,\{8,4\},144\>\>\>}
-| {{node handle | func handle} | {0x0000561F4E24EF30 | 0x0000561F4DB9EF50}}
+| {ID | 5 (topoId: 132) | urelu_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E30870 | 0x000056337754E210}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_6"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {6 (topoId: 131) | 0x0000563376E31250}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000600}}
+}"];
+
+"graph_1_node_7"[style="bold" shape="record" label="{KERNEL
+| {ID | 7 (topoId: 130) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E36650 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_8"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {8 (topoId: 129) | 0x0000563376E37150}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000800}}
+}"];
+
+"graph_1_node_9"[style="bold" shape="record" label="{KERNEL
+| {ID | 9 (topoId: 128) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E379E0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_10"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {10 (topoId: 127) | 0x0000563376E383E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000A00}}
+}"];
+
+"graph_1_node_11"[style="bold" shape="record" label="{KERNEL
+| {ID | 11 (topoId: 126) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E38C70 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_12"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {12 (topoId: 125) | 0x0000563376E39790}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000C00}}
+}"];
+
+"graph_1_node_13"[style="bold" shape="record" label="{KERNEL
+| {ID | 13 (topoId: 124) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3A020 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_14"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {14 (topoId: 123) | 0x0000563376E3AA20}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00000E00}}
+}"];
+
+"graph_1_node_15"[style="bold" shape="record" label="{KERNEL
+| {ID | 15 (topoId: 122) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3B2B0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_16"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {16 (topoId: 121) | 0x0000563376E3BDD0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001000}}
+}"];
+
+"graph_1_node_17"[style="bold" shape="record" label="{KERNEL
+| {ID | 17 (topoId: 120) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3C660 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_18"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {18 (topoId: 119) | 0x0000563376E3D060}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001200}}
+}"];
+
+"graph_1_node_19"[style="bold" shape="record" label="{KERNEL
+| {ID | 19 (topoId: 118) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3D8F0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_20"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {20 (topoId: 117) | 0x0000563376E3E410}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001400}}
+}"];
+
+"graph_1_node_21"[style="bold" shape="record" label="{KERNEL
+| {ID | 21 (topoId: 116) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3ECA0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_22"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {22 (topoId: 115) | 0x0000563376E3F6A0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001600}}
+}"];
+
+"graph_1_node_23"[style="bold" shape="record" label="{KERNEL
+| {ID | 23 (topoId: 114) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E3FF30 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_24"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {24 (topoId: 113) | 0x0000563376E40A50}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001800}}
+}"];
+
+"graph_1_node_25"[style="bold" shape="record" label="{KERNEL
+| {ID | 25 (topoId: 112) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E412E0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_26"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {26 (topoId: 111) | 0x0000563376E41CE0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001A00}}
+}"];
+
+"graph_1_node_27"[style="bold" shape="record" label="{KERNEL
+| {ID | 27 (topoId: 110) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E42570 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_28"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {28 (topoId: 109) | 0x0000563376E43090}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001C00}}
+}"];
+
+"graph_1_node_29"[style="bold" shape="record" label="{KERNEL
+| {ID | 29 (topoId: 108) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E43920 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_30"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {30 (topoId: 107) | 0x0000563376E44320}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00001E00}}
+}"];
+
+"graph_1_node_31"[style="bold" shape="record" label="{KERNEL
+| {ID | 31 (topoId: 106) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E44BB0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_32"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {32 (topoId: 105) | 0x0000563376E456D0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002000}}
+}"];
+
+"graph_1_node_33"[style="bold" shape="record" label="{KERNEL
+| {ID | 33 (topoId: 104) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E45F60 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_34"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {34 (topoId: 103) | 0x0000563376E46960}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002200}}
+}"];
+
+"graph_1_node_35"[style="bold" shape="record" label="{KERNEL
+| {ID | 35 (topoId: 102) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E471F0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_36"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {36 (topoId: 101) | 0x0000563376E47D10}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002400}}
+}"];
+
+"graph_1_node_37"[style="bold" shape="record" label="{KERNEL
+| {ID | 37 (topoId: 100) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E485A0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_38"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {38 (topoId: 99) | 0x0000563376E48FA0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002600}}
+}"];
+
+"graph_1_node_39"[style="bold" shape="record" label="{KERNEL
+| {ID | 39 (topoId: 98) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E49830 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_40"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {40 (topoId: 97) | 0x0000563376E4A350}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002800}}
+}"];
+
+"graph_1_node_41"[style="bold" shape="record" label="{KERNEL
+| {ID | 41 (topoId: 96) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E4ABE0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_42"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {42 (topoId: 95) | 0x0000563376E4B5E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002A00}}
+}"];
+
+"graph_1_node_43"[style="bold" shape="record" label="{KERNEL
+| {ID | 43 (topoId: 94) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E4BE70 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_44"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {44 (topoId: 93) | 0x0000563376E4C990}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002C00}}
+}"];
+
+"graph_1_node_45"[style="bold" shape="record" label="{KERNEL
+| {ID | 45 (topoId: 92) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E4D220 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_46"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {46 (topoId: 91) | 0x0000563376E4DC20}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00002E00}}
+}"];
+
+"graph_1_node_47"[style="bold" shape="record" label="{KERNEL
+| {ID | 47 (topoId: 90) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E4E4B0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_48"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {48 (topoId: 89) | 0x0000563376E4EFD0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003000}}
+}"];
+
+"graph_1_node_49"[style="bold" shape="record" label="{KERNEL
+| {ID | 49 (topoId: 88) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E4F860 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_50"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {50 (topoId: 87) | 0x0000563376E50260}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003200}}
+}"];
+
+"graph_1_node_51"[style="bold" shape="record" label="{KERNEL
+| {ID | 51 (topoId: 86) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E50AF0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_52"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {52 (topoId: 85) | 0x0000563376E51610}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003400}}
+}"];
+
+"graph_1_node_53"[style="bold" shape="record" label="{KERNEL
+| {ID | 53 (topoId: 84) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E51EA0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_54"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {54 (topoId: 83) | 0x0000563376E528A0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003600}}
+}"];
+
+"graph_1_node_55"[style="bold" shape="record" label="{KERNEL
+| {ID | 55 (topoId: 82) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E53130 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_56"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {56 (topoId: 81) | 0x0000563376E53C50}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003800}}
+}"];
+
+"graph_1_node_57"[style="bold" shape="record" label="{KERNEL
+| {ID | 57 (topoId: 80) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E544E0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_58"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {58 (topoId: 79) | 0x0000563376E54EE0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003A00}}
+}"];
+
+"graph_1_node_59"[style="bold" shape="record" label="{KERNEL
+| {ID | 59 (topoId: 78) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E55770 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_60"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {60 (topoId: 77) | 0x0000563376E56290}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003C00}}
+}"];
+
+"graph_1_node_61"[style="bold" shape="record" label="{KERNEL
+| {ID | 61 (topoId: 76) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E56B20 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_62"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {62 (topoId: 75) | 0x0000563376E57520}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00003E00}}
+}"];
+
+"graph_1_node_63"[style="bold" shape="record" label="{KERNEL
+| {ID | 63 (topoId: 74) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E57DB0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_64"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {64 (topoId: 73) | 0x0000563376E588D0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004000}}
+}"];
+
+"graph_1_node_65"[style="bold" shape="record" label="{KERNEL
+| {ID | 65 (topoId: 72) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E59160 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_66"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {66 (topoId: 71) | 0x0000563376E59B60}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004200}}
+}"];
+
+"graph_1_node_67"[style="bold" shape="record" label="{KERNEL
+| {ID | 67 (topoId: 70) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E5A3F0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_68"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {68 (topoId: 69) | 0x0000563376E5AF10}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004400}}
+}"];
+
+"graph_1_node_69"[style="bold" shape="record" label="{KERNEL
+| {ID | 69 (topoId: 68) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E5B7A0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_70"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {70 (topoId: 67) | 0x0000563376E5C1A0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004600}}
+}"];
+
+"graph_1_node_71"[style="bold" shape="record" label="{KERNEL
+| {ID | 71 (topoId: 66) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E5CA30 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_72"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {72 (topoId: 65) | 0x0000563376E5D550}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004800}}
+}"];
+
+"graph_1_node_73"[style="bold" shape="record" label="{KERNEL
+| {ID | 73 (topoId: 64) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E5DDE0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_74"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {74 (topoId: 63) | 0x0000563376E5E7E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004A00}}
+}"];
+
+"graph_1_node_75"[style="bold" shape="record" label="{KERNEL
+| {ID | 75 (topoId: 62) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E5F070 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_76"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {76 (topoId: 61) | 0x0000563376E5FB90}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004C00}}
+}"];
+
+"graph_1_node_77"[style="bold" shape="record" label="{KERNEL
+| {ID | 77 (topoId: 60) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E60420 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_78"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {78 (topoId: 59) | 0x0000563376E60E20}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00004E00}}
+}"];
+
+"graph_1_node_79"[style="bold" shape="record" label="{KERNEL
+| {ID | 79 (topoId: 58) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E616B0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_80"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {80 (topoId: 57) | 0x0000563376E621D0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005000}}
+}"];
+
+"graph_1_node_81"[style="bold" shape="record" label="{KERNEL
+| {ID | 81 (topoId: 56) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E62A60 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_82"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {82 (topoId: 55) | 0x0000563376E63460}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005200}}
+}"];
+
+"graph_1_node_83"[style="bold" shape="record" label="{KERNEL
+| {ID | 83 (topoId: 54) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E63CF0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_84"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {84 (topoId: 53) | 0x0000563376E64810}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005400}}
+}"];
+
+"graph_1_node_85"[style="bold" shape="record" label="{KERNEL
+| {ID | 85 (topoId: 52) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E650A0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_86"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {86 (topoId: 51) | 0x0000563376E65AA0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005600}}
+}"];
+
+"graph_1_node_87"[style="bold" shape="record" label="{KERNEL
+| {ID | 87 (topoId: 50) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E66330 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_88"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {88 (topoId: 49) | 0x0000563376E66E50}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005800}}
+}"];
+
+"graph_1_node_89"[style="bold" shape="record" label="{KERNEL
+| {ID | 89 (topoId: 48) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E676E0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_90"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {90 (topoId: 47) | 0x0000563376E680E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005A00}}
+}"];
+
+"graph_1_node_91"[style="bold" shape="record" label="{KERNEL
+| {ID | 91 (topoId: 46) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E68970 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_92"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {92 (topoId: 45) | 0x0000563376E69490}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005C00}}
+}"];
+
+"graph_1_node_93"[style="bold" shape="record" label="{KERNEL
+| {ID | 93 (topoId: 44) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E69D20 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_94"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {94 (topoId: 43) | 0x0000563376E6A720}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00005E00}}
+}"];
+
+"graph_1_node_95"[style="bold" shape="record" label="{KERNEL
+| {ID | 95 (topoId: 42) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E6AFB0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_96"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {96 (topoId: 41) | 0x0000563376E6BAD0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006000}}
+}"];
+
+"graph_1_node_97"[style="bold" shape="record" label="{KERNEL
+| {ID | 97 (topoId: 40) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E6C360 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_98"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {98 (topoId: 39) | 0x0000563376E6CD60}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006200}}
+}"];
+
+"graph_1_node_99"[style="bold" shape="record" label="{KERNEL
+| {ID | 99 (topoId: 38) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E6D5F0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_100"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {100 (topoId: 37) | 0x0000563376E6E110}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006400}}
+}"];
+
+"graph_1_node_101"[style="bold" shape="record" label="{KERNEL
+| {ID | 101 (topoId: 36) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E6E9A0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_102"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {102 (topoId: 35) | 0x0000563376E6F3A0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006600}}
+}"];
+
+"graph_1_node_103"[style="bold" shape="record" label="{KERNEL
+| {ID | 103 (topoId: 34) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E6FC30 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_104"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {104 (topoId: 33) | 0x0000563376E70750}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006800}}
+}"];
+
+"graph_1_node_105"[style="bold" shape="record" label="{KERNEL
+| {ID | 105 (topoId: 32) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E70FE0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_106"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {106 (topoId: 31) | 0x0000563376E719E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006A00}}
+}"];
+
+"graph_1_node_107"[style="bold" shape="record" label="{KERNEL
+| {ID | 107 (topoId: 30) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E72270 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_108"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {108 (topoId: 29) | 0x0000563376E72D90}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006C00}}
+}"];
+
+"graph_1_node_109"[style="bold" shape="record" label="{KERNEL
+| {ID | 109 (topoId: 28) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E73620 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_110"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {110 (topoId: 27) | 0x0000563376E74020}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00006E00}}
+}"];
+
+"graph_1_node_111"[style="bold" shape="record" label="{KERNEL
+| {ID | 111 (topoId: 26) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E748B0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_112"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {112 (topoId: 25) | 0x0000563376E753D0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007000}}
+}"];
+
+"graph_1_node_113"[style="bold" shape="record" label="{KERNEL
+| {ID | 113 (topoId: 24) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E75C60 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_114"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {114 (topoId: 23) | 0x0000563376E76660}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007200}}
+}"];
+
+"graph_1_node_115"[style="bold" shape="record" label="{KERNEL
+| {ID | 115 (topoId: 22) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E76EF0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_116"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {116 (topoId: 21) | 0x0000563376E77A10}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007400}}
+}"];
+
+"graph_1_node_117"[style="bold" shape="record" label="{KERNEL
+| {ID | 117 (topoId: 20) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E782A0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_118"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {118 (topoId: 19) | 0x0000563376E78CA0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007600}}
+}"];
+
+"graph_1_node_119"[style="bold" shape="record" label="{KERNEL
+| {ID | 119 (topoId: 18) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E79530 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_120"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {120 (topoId: 17) | 0x0000563376E7A050}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007800}}
+}"];
+
+"graph_1_node_121"[style="bold" shape="record" label="{KERNEL
+| {ID | 121 (topoId: 16) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E7A8E0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_122"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {122 (topoId: 15) | 0x0000563376E7B2E0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007A00}}
+}"];
+
+"graph_1_node_123"[style="bold" shape="record" label="{KERNEL
+| {ID | 123 (topoId: 14) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E7BB70 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_124"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {124 (topoId: 13) | 0x0000563376E7C690}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007C00}}
+}"];
+
+"graph_1_node_125"[style="bold" shape="record" label="{KERNEL
+| {ID | 125 (topoId: 12) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E7CF20 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_126"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {126 (topoId: 11) | 0x0000563376E7D920}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00007E00}}
+}"];
+
+"graph_1_node_127"[style="bold" shape="record" label="{KERNEL
+| {ID | 127 (topoId: 10) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E7E1B0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_128"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {128 (topoId: 9) | 0x0000563376E7ECD0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00008000}}
+}"];
+
+"graph_1_node_129"[style="bold" shape="record" label="{KERNEL
+| {ID | 129 (topoId: 8) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E7F560 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_130"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {130 (topoId: 7) | 0x0000563376E7FF60}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00008200}}
+}"];
+
+"graph_1_node_131"[style="bold" shape="record" label="{KERNEL
+| {ID | 131 (topoId: 6) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<16,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E807F0 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_132"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {132 (topoId: 5) | 0x0000563376E81310}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {128 | 0x0000001A00008400}}
+}"];
+
+"graph_1_node_133"[style="bold" shape="record" label="{KERNEL
+| {ID | 133 (topoId: 4) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E81BA0 | 0x00005633774A5A60}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_134"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {134 (topoId: 3) | 0x0000563376E825A0}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {16 | 0x0000001A00008600}}
+}"];
+
+"graph_1_node_135"[style="bold" shape="record" label="{KERNEL
+| {ID | 135 (topoId: 2) | _ZN8internal5gemvx6kernelIii13__nv_bfloat16S2_S2_fLb0ELb1ELb1ELb0ELi5ELb0E18cublasGemvParamsExIi30cublasGemvTensorStridedBatchedIKS2_ES6_S4_IS2_EfEEENSt9enable_ifIXntT5_EvE4typeET11_\<\<\<2,\{8,4\},144\>\>\>}
+| {{node handle | func handle} | {0x0000563376E82F50 | 0x000056337693AEF0}}
+| {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
+| {cooperative | 0}
+| {priority | 0}
+}"];
+
+"graph_1_node_136"[style="solid" shape="record" label="{
+MEM_ALLOC
+| {{ID | node handle} | {136 (topoId: 1) | 0x0000563376E83A70}}
+| {{{poolProps | {allocType | handleTypes | {location | {type | id}}} | {PINNED | NONE | DEVICE | 0}}}}
+| {{bytesize | dptr} | {16 | 0x0000001A00008800}}
+}"];
+
+"graph_1_node_137"[style="bold" shape="record" label="{KERNEL
+| {ID | 137 (topoId: 0) | badd_bf16\<\<\<1,1024,0\>\>\>}
+| {{node handle | func handle} | {0x0000563376E84300 | 0x00005633774A5A60}}
 | {accessPolicyWindow | {base_ptr | num_bytes | hitRatio | hitProp | missProp} | {0x0000000000000000 | 0 | 0.000000 | N | N}}
 | {cooperative | 0}
 | {priority | 0}
@@ -51,5 +1041,137 @@ MEM_ALLOC
 "graph_1_node_2" -> "graph_1_node_3" [headlabel=0];
 "graph_1_node_3" -> "graph_1_node_4" [headlabel=0];
 "graph_1_node_4" -> "graph_1_node_5" [headlabel=0];
+"graph_1_node_5" -> "graph_1_node_6" [headlabel=0];
+"graph_1_node_6" -> "graph_1_node_7" [headlabel=0];
+"graph_1_node_7" -> "graph_1_node_8" [headlabel=0];
+"graph_1_node_8" -> "graph_1_node_9" [headlabel=0];
+"graph_1_node_9" -> "graph_1_node_10" [headlabel=0];
+"graph_1_node_10" -> "graph_1_node_11" [headlabel=0];
+"graph_1_node_11" -> "graph_1_node_12" [headlabel=0];
+"graph_1_node_12" -> "graph_1_node_13" [headlabel=0];
+"graph_1_node_13" -> "graph_1_node_14" [headlabel=0];
+"graph_1_node_14" -> "graph_1_node_15" [headlabel=0];
+"graph_1_node_15" -> "graph_1_node_16" [headlabel=0];
+"graph_1_node_16" -> "graph_1_node_17" [headlabel=0];
+"graph_1_node_17" -> "graph_1_node_18" [headlabel=0];
+"graph_1_node_18" -> "graph_1_node_19" [headlabel=0];
+"graph_1_node_19" -> "graph_1_node_20" [headlabel=0];
+"graph_1_node_20" -> "graph_1_node_21" [headlabel=0];
+"graph_1_node_21" -> "graph_1_node_22" [headlabel=0];
+"graph_1_node_22" -> "graph_1_node_23" [headlabel=0];
+"graph_1_node_23" -> "graph_1_node_24" [headlabel=0];
+"graph_1_node_24" -> "graph_1_node_25" [headlabel=0];
+"graph_1_node_25" -> "graph_1_node_26" [headlabel=0];
+"graph_1_node_26" -> "graph_1_node_27" [headlabel=0];
+"graph_1_node_27" -> "graph_1_node_28" [headlabel=0];
+"graph_1_node_28" -> "graph_1_node_29" [headlabel=0];
+"graph_1_node_29" -> "graph_1_node_30" [headlabel=0];
+"graph_1_node_30" -> "graph_1_node_31" [headlabel=0];
+"graph_1_node_31" -> "graph_1_node_32" [headlabel=0];
+"graph_1_node_32" -> "graph_1_node_33" [headlabel=0];
+"graph_1_node_33" -> "graph_1_node_34" [headlabel=0];
+"graph_1_node_34" -> "graph_1_node_35" [headlabel=0];
+"graph_1_node_35" -> "graph_1_node_36" [headlabel=0];
+"graph_1_node_36" -> "graph_1_node_37" [headlabel=0];
+"graph_1_node_37" -> "graph_1_node_38" [headlabel=0];
+"graph_1_node_38" -> "graph_1_node_39" [headlabel=0];
+"graph_1_node_39" -> "graph_1_node_40" [headlabel=0];
+"graph_1_node_40" -> "graph_1_node_41" [headlabel=0];
+"graph_1_node_41" -> "graph_1_node_42" [headlabel=0];
+"graph_1_node_42" -> "graph_1_node_43" [headlabel=0];
+"graph_1_node_43" -> "graph_1_node_44" [headlabel=0];
+"graph_1_node_44" -> "graph_1_node_45" [headlabel=0];
+"graph_1_node_45" -> "graph_1_node_46" [headlabel=0];
+"graph_1_node_46" -> "graph_1_node_47" [headlabel=0];
+"graph_1_node_47" -> "graph_1_node_48" [headlabel=0];
+"graph_1_node_48" -> "graph_1_node_49" [headlabel=0];
+"graph_1_node_49" -> "graph_1_node_50" [headlabel=0];
+"graph_1_node_50" -> "graph_1_node_51" [headlabel=0];
+"graph_1_node_51" -> "graph_1_node_52" [headlabel=0];
+"graph_1_node_52" -> "graph_1_node_53" [headlabel=0];
+"graph_1_node_53" -> "graph_1_node_54" [headlabel=0];
+"graph_1_node_54" -> "graph_1_node_55" [headlabel=0];
+"graph_1_node_55" -> "graph_1_node_56" [headlabel=0];
+"graph_1_node_56" -> "graph_1_node_57" [headlabel=0];
+"graph_1_node_57" -> "graph_1_node_58" [headlabel=0];
+"graph_1_node_58" -> "graph_1_node_59" [headlabel=0];
+"graph_1_node_59" -> "graph_1_node_60" [headlabel=0];
+"graph_1_node_60" -> "graph_1_node_61" [headlabel=0];
+"graph_1_node_61" -> "graph_1_node_62" [headlabel=0];
+"graph_1_node_62" -> "graph_1_node_63" [headlabel=0];
+"graph_1_node_63" -> "graph_1_node_64" [headlabel=0];
+"graph_1_node_64" -> "graph_1_node_65" [headlabel=0];
+"graph_1_node_65" -> "graph_1_node_66" [headlabel=0];
+"graph_1_node_66" -> "graph_1_node_67" [headlabel=0];
+"graph_1_node_67" -> "graph_1_node_68" [headlabel=0];
+"graph_1_node_68" -> "graph_1_node_69" [headlabel=0];
+"graph_1_node_69" -> "graph_1_node_70" [headlabel=0];
+"graph_1_node_70" -> "graph_1_node_71" [headlabel=0];
+"graph_1_node_71" -> "graph_1_node_72" [headlabel=0];
+"graph_1_node_72" -> "graph_1_node_73" [headlabel=0];
+"graph_1_node_73" -> "graph_1_node_74" [headlabel=0];
+"graph_1_node_74" -> "graph_1_node_75" [headlabel=0];
+"graph_1_node_75" -> "graph_1_node_76" [headlabel=0];
+"graph_1_node_76" -> "graph_1_node_77" [headlabel=0];
+"graph_1_node_77" -> "graph_1_node_78" [headlabel=0];
+"graph_1_node_78" -> "graph_1_node_79" [headlabel=0];
+"graph_1_node_79" -> "graph_1_node_80" [headlabel=0];
+"graph_1_node_80" -> "graph_1_node_81" [headlabel=0];
+"graph_1_node_81" -> "graph_1_node_82" [headlabel=0];
+"graph_1_node_82" -> "graph_1_node_83" [headlabel=0];
+"graph_1_node_83" -> "graph_1_node_84" [headlabel=0];
+"graph_1_node_84" -> "graph_1_node_85" [headlabel=0];
+"graph_1_node_85" -> "graph_1_node_86" [headlabel=0];
+"graph_1_node_86" -> "graph_1_node_87" [headlabel=0];
+"graph_1_node_87" -> "graph_1_node_88" [headlabel=0];
+"graph_1_node_88" -> "graph_1_node_89" [headlabel=0];
+"graph_1_node_89" -> "graph_1_node_90" [headlabel=0];
+"graph_1_node_90" -> "graph_1_node_91" [headlabel=0];
+"graph_1_node_91" -> "graph_1_node_92" [headlabel=0];
+"graph_1_node_92" -> "graph_1_node_93" [headlabel=0];
+"graph_1_node_93" -> "graph_1_node_94" [headlabel=0];
+"graph_1_node_94" -> "graph_1_node_95" [headlabel=0];
+"graph_1_node_95" -> "graph_1_node_96" [headlabel=0];
+"graph_1_node_96" -> "graph_1_node_97" [headlabel=0];
+"graph_1_node_97" -> "graph_1_node_98" [headlabel=0];
+"graph_1_node_98" -> "graph_1_node_99" [headlabel=0];
+"graph_1_node_99" -> "graph_1_node_100" [headlabel=0];
+"graph_1_node_100" -> "graph_1_node_101" [headlabel=0];
+"graph_1_node_101" -> "graph_1_node_102" [headlabel=0];
+"graph_1_node_102" -> "graph_1_node_103" [headlabel=0];
+"graph_1_node_103" -> "graph_1_node_104" [headlabel=0];
+"graph_1_node_104" -> "graph_1_node_105" [headlabel=0];
+"graph_1_node_105" -> "graph_1_node_106" [headlabel=0];
+"graph_1_node_106" -> "graph_1_node_107" [headlabel=0];
+"graph_1_node_107" -> "graph_1_node_108" [headlabel=0];
+"graph_1_node_108" -> "graph_1_node_109" [headlabel=0];
+"graph_1_node_109" -> "graph_1_node_110" [headlabel=0];
+"graph_1_node_110" -> "graph_1_node_111" [headlabel=0];
+"graph_1_node_111" -> "graph_1_node_112" [headlabel=0];
+"graph_1_node_112" -> "graph_1_node_113" [headlabel=0];
+"graph_1_node_113" -> "graph_1_node_114" [headlabel=0];
+"graph_1_node_114" -> "graph_1_node_115" [headlabel=0];
+"graph_1_node_115" -> "graph_1_node_116" [headlabel=0];
+"graph_1_node_116" -> "graph_1_node_117" [headlabel=0];
+"graph_1_node_117" -> "graph_1_node_118" [headlabel=0];
+"graph_1_node_118" -> "graph_1_node_119" [headlabel=0];
+"graph_1_node_119" -> "graph_1_node_120" [headlabel=0];
+"graph_1_node_120" -> "graph_1_node_121" [headlabel=0];
+"graph_1_node_121" -> "graph_1_node_122" [headlabel=0];
+"graph_1_node_122" -> "graph_1_node_123" [headlabel=0];
+"graph_1_node_123" -> "graph_1_node_124" [headlabel=0];
+"graph_1_node_124" -> "graph_1_node_125" [headlabel=0];
+"graph_1_node_125" -> "graph_1_node_126" [headlabel=0];
+"graph_1_node_126" -> "graph_1_node_127" [headlabel=0];
+"graph_1_node_127" -> "graph_1_node_128" [headlabel=0];
+"graph_1_node_128" -> "graph_1_node_129" [headlabel=0];
+"graph_1_node_129" -> "graph_1_node_130" [headlabel=0];
+"graph_1_node_130" -> "graph_1_node_131" [headlabel=0];
+"graph_1_node_131" -> "graph_1_node_132" [headlabel=0];
+"graph_1_node_132" -> "graph_1_node_133" [headlabel=0];
+"graph_1_node_133" -> "graph_1_node_134" [headlabel=0];
+"graph_1_node_134" -> "graph_1_node_135" [headlabel=0];
+"graph_1_node_135" -> "graph_1_node_136" [headlabel=0];
+"graph_1_node_136" -> "graph_1_node_137" [headlabel=0];
 }
 }

@@ -1,32 +1,49 @@
 //! https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/
 //! https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp
 
-use candle_nn::{linear_no_bias, Linear, Module, VarBuilder, VarMap};
+use std::time::Instant;
+
+use candle_nn::{linear, Linear, Module, VarBuilder, VarMap};
 use cuda_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
 
 use candle_core::{DType, Device, Tensor};
 
 const IN_DIM: usize = 8;
 const HIDDEN_DIM: usize = 64;
+const N_HIDDEN: usize = 32;
 const OUT_DIM: usize = 8;
 
+const BENCH_N: usize = 100;
+
 struct Model {
-    ff1: Linear,
-    ff2: Linear,
+    up: Linear,
+    hidden: Vec<Linear>,
+    down: Linear,
 }
 
 impl Model {
     fn new(vb: &VarBuilder) -> candle_core::Result<Self> {
+        let mut hidden_layers = Vec::with_capacity(N_HIDDEN);
+        for i in 0..N_HIDDEN {
+            hidden_layers.push(linear(HIDDEN_DIM, HIDDEN_DIM, vb.pp("hidden").pp(i))?);
+        }
         Ok(Self {
-            ff1: linear_no_bias(IN_DIM, HIDDEN_DIM, vb.pp("ff1"))?,
-            ff2: linear_no_bias(HIDDEN_DIM, OUT_DIM, vb.pp("ff2"))?,
+            up: linear(IN_DIM, HIDDEN_DIM, vb.pp("up"))?,
+            hidden: hidden_layers,
+            down: linear(HIDDEN_DIM, OUT_DIM, vb.pp("down"))?,
         })
     }
 }
 
 impl Module for Model {
     fn forward(&self, xs: &Tensor) -> candle_core::Result<Tensor> {
-        xs.apply(&self.ff1)?.relu()?.apply(&self.ff2)
+        let mut hidden_states = xs.apply(&self.up)?.relu()?;
+
+        for layer in &self.hidden {
+            hidden_states = hidden_states.apply(layer)?;
+        }
+
+        hidden_states.apply(&self.down)
     }
 }
 
@@ -53,9 +70,32 @@ fn main() -> anyhow::Result<()> {
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
 
-    let new = Tensor::randn(0., 1., (1, IN_DIM), &device)?.to_dtype(DType::BF16)?;
-    println!("starting");
-    graph.replay([("x", &new)].into())?;
-    println!("ending");
+    let start = Instant::now();
+    for _ in 0..BENCH_N {
+        let new = Tensor::randn(0., 1., (1, IN_DIM), &device)?.to_dtype(DType::BF16)?;
+        graph.replay([("x", &new)].into())?;
+    }
+    let graph_duration = Instant::now().duration_since(start);
+
+    let start = Instant::now();
+    for _ in 0..BENCH_N {
+        let x = Tensor::randn(0., 1., (1, IN_DIM), &device)?.to_dtype(DType::BF16)?;
+        let _ = model.forward(&x)?;
+    }
+    let eager_duration = Instant::now().duration_since(start);
+    println!(
+        "Graph run took {}s",
+        graph_duration.div_f32(BENCH_N as f32).as_secs_f32()
+    );
+    println!(
+        "Eager run took {}s",
+        eager_duration.div_f32(BENCH_N as f32).as_secs_f32()
+    );
+    println!(
+        "Graph is {} faster",
+        eager_duration.div_f32(BENCH_N as f32).as_secs_f32()
+            / graph_duration.div_f32(BENCH_N as f32).as_secs_f32()
+    );
+
     Ok(())
 }
