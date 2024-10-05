@@ -3,8 +3,8 @@ use candle_core::{
     cuda::cudarc::driver::{
         self,
         sys::{
-            CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUstream,
-            CUstreamCaptureMode,
+            CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUgraphNode,
+            CUstream, CUstreamCaptureMode,
         },
         DevicePtr, DeviceSlice,
     },
@@ -14,11 +14,16 @@ use candle_core::{
 use candle_nn::Module;
 use half::{bf16, f16};
 use std::{
+    cell::Cell,
     collections::{HashMap, HashSet},
+    marker::PhantomData,
+    mem::MaybeUninit,
     path::Path,
     process::Command,
     ptr,
 };
+
+use crate::{KernelLaunchParams, Node, NodeData};
 
 /// # Safety
 /// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
@@ -126,6 +131,9 @@ pub struct Graph {
     stream: CUstream,
     device: Device,
     input_tensors: HashMap<&'static str, Tensor>,
+    ran_graph: Cell<bool>,
+    // CUgraph is not thread safe!
+    _marker: PhantomData<*const ()>,
 }
 
 impl Graph {
@@ -204,7 +212,7 @@ impl Graph {
         }
 
         let mut cu_graph: CUgraph = unsafe {
-            let mut cu_graph = std::mem::MaybeUninit::uninit();
+            let mut cu_graph = MaybeUninit::uninit();
             driver::sys::lib()
                 .cuGraphCreate(cu_graph.as_mut_ptr(), 0)
                 .result()?;
@@ -235,7 +243,7 @@ impl Graph {
 
         /////  CREATING THE GRAPH EXECUTOR
         let cu_graph_e: CUgraphExec = unsafe {
-            let mut cu_graph_e = std::mem::MaybeUninit::uninit();
+            let mut cu_graph_e = MaybeUninit::uninit();
             // https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp#L166-L176
             driver::sys::lib()
                 .cuGraphInstantiateWithFlags(
@@ -260,6 +268,8 @@ impl Graph {
             stream: *cu_stream,
             device: device.clone(),
             input_tensors,
+            _marker: PhantomData,
+            ran_graph: Cell::new(false),
         })
     }
 
@@ -297,6 +307,7 @@ impl Graph {
                 .cuGraphLaunch(self.exec, self.stream)
                 .result()?
         }
+        self.ran_graph.set(true);
         self.device.synchronize()?;
         Ok(())
     }
@@ -312,9 +323,7 @@ impl Graph {
         let tmp = if let GraphDumpFormat::Dot = format {
             out.as_ref().to_string_lossy().trim().to_string()
         } else {
-            format!("{}/candle-graph-dump.dot", std::env::temp_dir().display())
-                .trim()
-                .to_string()
+            format!("{}.dot", out.as_ref().display())
         };
         let verbosity = match verbosity {
             GraphDumpVerbosity::Verbose => {
@@ -343,10 +352,107 @@ impl Graph {
         std::fs::write(out, command)?;
         Ok(())
     }
+
+    /// Retrieve the nodes for this graph. Node dependency information is not tracked.
+    pub fn nodes(&self) -> anyhow::Result<Vec<Node<'_>>> {
+        let mut num_nodes = unsafe {
+            let mut num_nodes = MaybeUninit::uninit();
+            driver::sys::lib()
+                .cuGraphGetNodes(self.graph, ptr::null_mut(), num_nodes.as_mut_ptr())
+                .result()?;
+            num_nodes.assume_init()
+        };
+        let node_ptrs = unsafe {
+            let mut nodes: Vec<CUgraphNode> = Vec::with_capacity(num_nodes);
+            driver::sys::lib()
+                .cuGraphGetNodes(self.graph, nodes.as_mut_ptr(), &mut num_nodes as *mut _)
+                .result()?;
+            nodes.set_len(num_nodes);
+            nodes
+        };
+
+        let mut nodes = Vec::new();
+        for node in &node_ptrs {
+            let node_type = unsafe {
+                let mut node_type = MaybeUninit::uninit();
+                driver::sys::lib()
+                    .cuGraphNodeGetType(*node, node_type.as_mut_ptr())
+                    .result()?;
+                node_type.assume_init()
+            };
+            #[allow(clippy::single_match)]
+            let data = match node_type {
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_KERNEL => {
+                    let node_params = unsafe {
+                        let mut node_params = MaybeUninit::uninit();
+                        driver::sys::lib()
+                            .cuGraphKernelNodeGetParams_v2(*node, node_params.as_mut_ptr())
+                            .result()?;
+                        node_params.assume_init()
+                    };
+                    let params = KernelLaunchParams {
+                        grid_dim_x: node_params.gridDimX,
+                        grid_dim_y: node_params.gridDimY,
+                        grid_dim_z: node_params.gridDimZ,
+                        block_dim_x: node_params.blockDimX,
+                        block_dim_y: node_params.blockDimY,
+                        block_dim_z: node_params.blockDimZ,
+                        shared_mem_bytes: node_params.sharedMemBytes,
+                    };
+                    NodeData::Kernel {
+                        launch_params: params,
+                    }
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_BATCH_MEM_OP => {
+                    NodeData::BatchMemOp
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_CONDITIONAL => {
+                    NodeData::Conditional
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_EMPTY => NodeData::Empty,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_EVENT_RECORD => {
+                    NodeData::EventRecord
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_EXT_SEMAS_SIGNAL => {
+                    NodeData::ExtSemasSignal
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_EXT_SEMAS_WAIT => {
+                    NodeData::ExtSemasWait
+                }
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_GRAPH => NodeData::Graph,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_HOST => NodeData::Host,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_MEMCPY => NodeData::Memcpy,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_MEMSET => NodeData::Memset,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_MEM_ALLOC => NodeData::MemAlloc,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_MEM_FREE => NodeData::MemFree,
+                driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_WAIT_EVENT => NodeData::WaitEvent,
+            };
+
+            let node = Node {
+                data,
+                inner: *node,
+                _marker: PhantomData,
+            };
+            nodes.push(node);
+        }
+
+        Ok(nodes)
+    }
 }
 
 impl Drop for Graph {
     fn drop(&mut self) {
+        if !self.ran_graph.get() {
+            unsafe {
+                driver::sys::lib()
+                    .cuGraphLaunch(self.exec, self.stream)
+                    .result()
+                    .expect("Graph was not run, final run failed")
+            }
+            self.device
+                .synchronize()
+                .expect("Graph was not run, device sync failed")
+        }
         unsafe { driver::sys::lib().cuGraphDestroy(self.graph) }
             .result()
             .expect("Graph destroy failed");
