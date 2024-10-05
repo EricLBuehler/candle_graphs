@@ -167,6 +167,7 @@ name = "cuda_graph"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bindgen_cuda",
  "candle-core",
  "candle-nn",
  "half",

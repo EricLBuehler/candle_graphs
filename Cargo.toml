@@ -8,3 +8,6 @@ anyhow = "1.0.89"
 candle-core = { git = "https://github.com/huggingface/candle.git", version = "0.7.2", features = ["cuda"] }
 candle-nn = { git = "https://github.com/huggingface/candle.git", version = "0.7.2", features = ["cuda"] }
 half = "2.4.1"
+
+[build-dependencies]
+bindgen_cuda = "0.1.1"
