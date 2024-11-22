@@ -4,7 +4,6 @@ use std::f64::consts::E;
 
 use candle_core::{DType, Device, Tensor};
 
-const N: usize = 1000;
 const SHAPE: (usize, usize) = (32, 32);
 
 fn main() -> anyhow::Result<()> {
@@ -13,6 +12,7 @@ fn main() -> anyhow::Result<()> {
     let x = Tensor::ones(SHAPE, DType::BF16, &device)?;
     let mut y: Option<Tensor> = None;
 
+    // Build the graph. The closure here is automatically traced to build the graph.
     let graph = Graph::new(
         || {
             let out_data = x.matmul(&x)?.log()?;
@@ -25,10 +25,9 @@ fn main() -> anyhow::Result<()> {
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
 
-    for i in 1..=N {
-        let new = Tensor::full(E.powi(i as i32), SHAPE, &device)?.to_dtype(DType::BF16)?;
-        graph.replay([("x", &new)].into())?;
-    }
+    // Replay the graph. This can be done any number of times.
+    let new = Tensor::full(E, SHAPE, &device)?.to_dtype(DType::BF16)?;
+    graph.replay([("x", &new)].into())?;
 
     Ok(())
 }
