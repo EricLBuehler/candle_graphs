@@ -1,3 +1,4 @@
+use anyhow::Context;
 use candle_core::{
     backend::BackendStorage,
     cuda::cudarc::driver::{
@@ -339,7 +340,8 @@ impl Graph {
         let command = Command::new("dot")
             .arg(format!("-T{ty}"))
             .arg(tmp)
-            .output()?
+            .output()
+            .context("`candle_graph` requires the graphviz utility to be installed: https://graphviz.org/download/")?
             .stdout;
         std::fs::write(out, command)?;
         Ok(())

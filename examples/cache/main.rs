@@ -3,8 +3,8 @@
 
 use std::time::Instant;
 
+use candle_graph::{cache::KvCache, Graph, GraphDumpFormat, GraphDumpVerbosity};
 use candle_nn::{linear, Linear, VarBuilder, VarMap};
-use cuda_graph::{cache::KvCache, Graph, GraphDumpFormat, GraphDumpVerbosity};
 
 use candle_core::{DType, Device, Tensor};
 
@@ -38,7 +38,7 @@ impl Model {
             cache: KvCache::new(0, 1000),
         })
     }
-    
+
     fn forward(&mut self, xs: &Tensor) -> candle_core::Result<Tensor> {
         let hidden_states = xs.apply(&self.up)?.relu()?;
 

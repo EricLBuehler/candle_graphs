@@ -1,15 +1,20 @@
-use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
-use half::bf16;
+# `candle_graph`
 
-use std::f64::consts::E;
+Easy-to-use CUDA graph API for Candle.
+
+## Example
+```rust
+use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity, NodeData};
+
+use std::{f64::consts::E, time::Instant};
 
 use candle_core::{DType, Device, Tensor};
 
-#[test]
-fn test_matmuls() -> anyhow::Result<()> {
-    const N: usize = 50;
-    const SHAPE: (usize, usize) = (4, 4);
+const N: usize = 1000;
+const INNER_N: usize = 25;
+const SHAPE: (usize, usize) = (32, 32);
 
+fn main() -> anyhow::Result<()> {
     let device = Device::new_cuda_with_stream(0)?;
 
     let x = Tensor::ones(SHAPE, DType::BF16, &device)?;
@@ -17,7 +22,7 @@ fn test_matmuls() -> anyhow::Result<()> {
 
     let graph = Graph::new(
         || {
-            let out_data = x.log()?;
+            let mut out_data = x.matmul(&x)?;
             y = Some(out_data);
             Ok(())
         },
@@ -30,16 +35,8 @@ fn test_matmuls() -> anyhow::Result<()> {
     for i in 1..=N {
         let new = Tensor::full(E.powi(i as i32), SHAPE, &device)?.to_dtype(DType::BF16)?;
         graph.replay([("x", &new)].into())?;
-        if let Some(y) = &y {
-            assert_eq!(
-                y.to_vec2::<bf16>()?,
-                Tensor::new(i as f32, &device)?
-                    .to_dtype(DType::BF16)?
-                    .broadcast_as(y.shape())?
-                    .to_vec2::<bf16>()?
-            );
-        }
     }
-
+    
     Ok(())
 }
+```

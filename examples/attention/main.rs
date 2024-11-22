@@ -3,8 +3,8 @@
 
 use std::{ops::Mul, time::Instant};
 
+use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
 use candle_nn::{linear_no_bias, Linear, VarBuilder, VarMap};
-use cuda_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
 
 use candle_core::{DType, Device, Tensor};
 

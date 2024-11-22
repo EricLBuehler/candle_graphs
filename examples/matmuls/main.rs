@@ -1,7 +1,7 @@
 //! https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/
 //! https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp
 
-use cuda_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity, NodeData};
+use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity, NodeData};
 
 use std::{f64::consts::E, time::Instant};
 
