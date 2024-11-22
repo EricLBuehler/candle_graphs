@@ -24,7 +24,7 @@ use std::{
     ptr,
 };
 
-use crate::{KernelLaunchParams, Node, NodeData};
+use crate::{KernelLaunchParams, Node, NodeData, COPY2D_FINGERPRINT};
 
 /// # Safety
 /// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
@@ -222,12 +222,8 @@ impl Graph {
 
         unsafe {
             driver::sys::lib()
-                .cuStreamBeginCaptureToGraph(
+                .cuStreamBeginCapture_v2(
                     *cu_stream,
-                    cu_graph,
-                    ptr::null(),
-                    ptr::null(),
-                    0,
                     CUstreamCaptureMode::CU_STREAM_CAPTURE_MODE_RELAXED,
                 )
                 .result()?
@@ -351,6 +347,7 @@ impl Graph {
 
     /// Retrieve the nodes for this graph. Node dependency information is not tracked.
     pub fn nodes(&self) -> anyhow::Result<Vec<Node<'_>>> {
+        println!("Getting nodes");
         let mut num_nodes = unsafe {
             let mut num_nodes = MaybeUninit::uninit();
             driver::sys::lib()
@@ -386,6 +383,13 @@ impl Graph {
                             .result()?;
                         node_params.assume_init()
                     };
+                    let vec = unsafe { std::slice::from_raw_parts(node_params.kernelParams, 1) };
+                    for item in vec {
+                        let arg_ptr = *item as *const u64;
+                        if unsafe { *arg_ptr } == COPY2D_FINGERPRINT {
+                            println!("found it ");
+                        }
+                    }
                     let params = KernelLaunchParams {
                         grid_dim_x: node_params.gridDimX,
                         grid_dim_y: node_params.gridDimY,
