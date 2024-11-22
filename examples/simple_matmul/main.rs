@@ -1,13 +1,3 @@
-# `candle_graph`
-
-Easy-to-use CUDA graph API for Candle 🔥.
-
-## Features 
-- Simple, abstracted API
-- Generate `.dot` graphs
-
-## Example
-```rust
 use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
 
 use std::f64::consts::E;
@@ -42,8 +32,3 @@ fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
-```
-
-Generated `.dot` graph:
-
-<img src="https://github.com/user-attachments/assets/b44887ea-b947-4c86-a9c0-1fc89d4c2495" width="400">
