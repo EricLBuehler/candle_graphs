@@ -2,6 +2,7 @@
 //! https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp
 
 use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity, NodeData};
+use candle_graph_macro::GraphInputItem;
 
 use std::{f64::consts::E, time::Instant};
 
@@ -11,6 +12,11 @@ const N: usize = 1000;
 const INNER_N: usize = 25;
 const SHAPE: (usize, usize) = (32, 32);
 
+#[derive(GraphInputItem)]
+struct Inputs {
+    x: Tensor,
+}
+
 fn main() -> anyhow::Result<()> {
     let device = Device::new_cuda_with_stream(0)?;
 
@@ -18,7 +24,8 @@ fn main() -> anyhow::Result<()> {
     let mut y: Option<Tensor> = None;
 
     let graph = Graph::new(
-        || {
+        |input| {
+            let x = &input.x;
             let mut out_data = x.matmul(&x)?;
             for _ in 0..INNER_N {
                 out_data = out_data.matmul(&x)?;
@@ -27,7 +34,7 @@ fn main() -> anyhow::Result<()> {
             Ok(())
         },
         &device,
-        [("x", x.clone())].into(),
+        Inputs { x },
     )?;
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
@@ -51,7 +58,7 @@ fn main() -> anyhow::Result<()> {
     let start = Instant::now();
     for i in 1..=N {
         let new = Tensor::full(E.powi(i as i32), SHAPE, &device)?.to_dtype(DType::BF16)?;
-        graph.replay([("x", &new)].into())?;
+        graph.replay(Inputs { x: new })?;
     }
     let graph_duration = Instant::now().duration_since(start);
 

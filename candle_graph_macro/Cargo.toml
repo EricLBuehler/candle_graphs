@@ -1,0 +1,22 @@
+[package]
+name = "candle_graph_macro"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+syn = "2.0.66"
+quote = "1.0"
+proc-macro2 = "1.0"
+quote_into = "0.2.0"
+
+anyhow.workspace = true
+candle-core.workspace = true
+candle-nn.workspace = true
+
+candle_graph = { path = "../candle_graph" }
+
+[lib]
+proc-macro = true

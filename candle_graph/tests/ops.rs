@@ -1,9 +1,23 @@
-use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
+use candle_graph::{copy_inplace, Graph, GraphDumpFormat, GraphDumpVerbosity, GraphInput};
 use half::bf16;
 
-use std::f64::consts::E;
+use std::{collections::HashMap, f64::consts::E};
 
 use candle_core::{DType, Device, Tensor};
+
+struct Inputs {
+    x: Tensor,
+}
+
+impl GraphInput for Inputs {
+    fn to_inputs(&self) -> HashMap<String, Tensor> {
+        [("x".to_string(), self.x.clone())].into()
+    }
+    fn load_inputs_inplace(&self, input: Self, device: &Device) -> anyhow::Result<()> {
+        unsafe { copy_inplace(&input.x, &self.x, device)? };
+        Ok(())
+    }
+}
 
 #[test]
 fn test_matmuls() -> anyhow::Result<()> {
@@ -16,20 +30,21 @@ fn test_matmuls() -> anyhow::Result<()> {
     let mut y: Option<Tensor> = None;
 
     let graph = Graph::new(
-        || {
+        |input| {
+            let x = &input.x;
             let out_data = x.log()?;
             y = Some(out_data);
             Ok(())
         },
         &device,
-        [("x", x.clone())].into(),
+        Inputs { x },
     )?;
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
 
     for i in 1..=N {
         let new = Tensor::full(E.powi(i as i32), SHAPE, &device)?.to_dtype(DType::BF16)?;
-        graph.replay([("x", &new)].into())?;
+        graph.replay(Inputs { x: new })?;
         if let Some(y) = &y {
             assert_eq!(
                 y.to_vec2::<bf16>()?,

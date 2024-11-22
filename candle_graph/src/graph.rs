@@ -27,9 +27,11 @@ use std::{
 
 use crate::{KernelLaunchParams, Node, NodeData, COPY2D_FINGERPRINT};
 
+/// Copy a tensor inplace from src to dst. This can be used to implement `GraphInput`.
+///
 /// # Safety
 /// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
-unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyhow::Result<()> {
+pub unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyhow::Result<()> {
     match (&*src.storage_and_layout().0, &*dst.storage_and_layout().0) {
         (Storage::Cuda(src), Storage::Cuda(tgt)) => {
             // What we are really doing:
@@ -127,25 +129,61 @@ pub enum GraphDumpVerbosity {
     Verbose,
 }
 
-pub struct Graph {
+pub trait GraphInput {
+    fn to_inputs(&self) -> HashMap<String, Tensor>;
+    fn load_inputs_inplace(&self, input: Self, device: &Device) -> anyhow::Result<()>;
+}
+
+impl GraphInput for HashMap<&'static str, Tensor> {
+    fn to_inputs(&self) -> HashMap<String, Tensor> {
+        self.iter()
+            .map(|(k, v)| (k.to_string(), v.clone()))
+            .collect()
+    }
+    fn load_inputs_inplace(&self, input: Self, device: &Device) -> anyhow::Result<()> {
+        let mut added = HashSet::new();
+        for (name, input) in &input {
+            if !added.insert(name) {
+                panic!("Got duplicate inputs {name}");
+            }
+            if !input.is_contiguous() {
+                panic!("Input {name} is not contiguous");
+            }
+            if let Some(inp_ref) = self.get(name) {
+                unsafe { copy_inplace(input, inp_ref, device)? };
+            } else {
+                panic!("Graph has no input {name}");
+            }
+        }
+        if added.len() != input.len() {
+            panic!(
+                "Some inputs were not provided: expected {:?}, got {added:?}",
+                input.keys().collect::<Vec<_>>()
+            );
+        }
+        Ok(())
+    }
+}
+
+pub struct Graph<T: GraphInput> {
     graph: CUgraph,
     exec: CUgraphExec,
     stream: CUstream,
     device: Device,
-    input_tensors: HashMap<&'static str, Tensor>,
+    input: T,
     ran_graph: Cell<bool>,
     // CUgraph is not thread safe!
     _marker: PhantomData<*const ()>,
 }
 
-impl Graph {
+impl<T: GraphInput> Graph<T> {
     /// Initialize a CUDA graph, executing the closure to capture a graph.
     ///
     /// The input tensors provided must all be contiguous.
     pub fn new(
-        from_code: impl FnOnce() -> anyhow::Result<()>,
+        from_code: impl FnOnce(&T) -> anyhow::Result<()>,
         device: &Device,
-        input_tensors: HashMap<&'static str, Tensor>,
+        input: T,
     ) -> anyhow::Result<Self> {
         let cu_device = match &device {
             Device::Cuda(dev) => dev,
@@ -230,7 +268,7 @@ impl Graph {
                 .result()?
         }
 
-        from_code()?;
+        from_code(&input)?;
 
         /////  END CAPTURE AND WRITE TO THE GRAPH
         unsafe {
@@ -254,7 +292,7 @@ impl Graph {
             cu_graph_e.assume_init()
         };
 
-        for (name, input) in &input_tensors {
+        for (name, input) in &input.to_inputs() {
             if !input.is_contiguous() {
                 anyhow::bail!("Input {name} is not contiguous");
             }
@@ -265,7 +303,7 @@ impl Graph {
             exec: cu_graph_e,
             stream: *cu_stream,
             device: device.clone(),
-            input_tensors,
+            input,
             _marker: PhantomData,
             ran_graph: Cell::new(false),
         })
@@ -279,27 +317,8 @@ impl Graph {
     /// # Panics
     /// - The inputs provided here must match the inputs provided upon construction.
     /// - The inputs provided here must all be continuous
-    pub fn replay(&self, input_tensors: HashMap<&'static str, &Tensor>) -> anyhow::Result<()> {
-        let mut added = HashSet::new();
-        for (name, input) in &input_tensors {
-            if !added.insert(name) {
-                panic!("Got duplicate inputs {name}");
-            }
-            if !input.is_contiguous() {
-                panic!("Input {name} is not contiguous");
-            }
-            if let Some(inp_ref) = self.input_tensors.get(name) {
-                unsafe { copy_inplace(input, inp_ref, &self.device)? };
-            } else {
-                panic!("Graph has no input {name}");
-            }
-        }
-        if added.len() != input_tensors.len() {
-            panic!(
-                "Some inputs were not provided: expected {:?}, got {added:?}",
-                input_tensors.keys().collect::<Vec<_>>()
-            );
-        }
+    pub fn replay(&self, input: T) -> anyhow::Result<()> {
+        self.input.load_inputs_inplace(input, &self.device)?;
         unsafe {
             driver::sys::lib()
                 .cuGraphLaunch(self.exec, self.stream)
@@ -442,7 +461,7 @@ impl Graph {
     }
 }
 
-impl Drop for Graph {
+impl<T: GraphInput> Drop for Graph<T> {
     fn drop(&mut self) {
         if !self.ran_graph.get() {
             unsafe {

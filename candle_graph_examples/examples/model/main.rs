@@ -4,6 +4,7 @@
 use std::time::Instant;
 
 use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
+use candle_graph_macro::GraphInputItem;
 use candle_nn::{linear, Linear, Module, VarBuilder, VarMap};
 
 use candle_core::{DType, Device, Tensor};
@@ -19,6 +20,11 @@ const OUT_DIM: usize = 8;
 const N_HIDDEN: usize = 12;
 
 const BENCH_N: usize = 100;
+
+#[derive(GraphInputItem)]
+struct Inputs {
+    x: Tensor,
+}
 
 struct Model {
     up: Linear,
@@ -64,13 +70,14 @@ fn main() -> anyhow::Result<()> {
     let mut y: Option<Tensor> = None;
 
     let graph = Graph::new(
-        || {
+        |input| {
+            let x = &input.x;
             let out_data = model.forward(&x)?;
             y = Some(out_data);
             Ok(())
         },
         &device,
-        [("x", x.clone())].into(),
+        Inputs { x },
     )?;
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
@@ -78,7 +85,7 @@ fn main() -> anyhow::Result<()> {
     let start = Instant::now();
     for _ in 0..BENCH_N {
         let new = Tensor::randn(0., 1., (1, IN_DIM), &device)?.to_dtype(DType::BF16)?;
-        graph.replay([("x", &new)].into())?;
+        graph.replay(Inputs { x: new })?;
     }
     let graph_duration = Instant::now().duration_since(start);
 

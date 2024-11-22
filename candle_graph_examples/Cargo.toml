@@ -1,0 +1,17 @@
+[package]
+name = "candle_graph_examples"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+candle-core.workspace = true
+candle-nn.workspace = true
+candle_graph = { path = "../candle_graph" }
+candle_graph_macro = { path = "../candle_graph_macro" }
+
+[build-dependencies]
+bindgen_cuda = "0.1.1"

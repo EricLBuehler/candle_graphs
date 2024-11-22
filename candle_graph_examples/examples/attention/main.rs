@@ -4,6 +4,7 @@
 use std::{ops::Mul, time::Instant};
 
 use candle_graph::{Graph, GraphDumpFormat, GraphDumpVerbosity};
+use candle_graph_macro::GraphInputItem;
 use candle_nn::{linear_no_bias, Linear, VarBuilder, VarMap};
 
 use candle_core::{DType, Device, Tensor};
@@ -17,6 +18,11 @@ const KV_GROUPS: usize = NUM_ATTN_HEADS / NUM_KV_HEADS;
 const NUM_LAYERS: usize = 32;
 
 const BENCH_N: usize = 100;
+
+#[derive(GraphInputItem)]
+struct Inputs {
+    x: Tensor,
+}
 
 struct Model {
     q_proj: Linear,
@@ -112,8 +118,9 @@ fn main() -> anyhow::Result<()> {
     let mut y: Option<Tensor> = None;
 
     let graph = Graph::new(
-        || {
-            let mut xs = inputs.clone();
+        |input| {
+            let x = &input.x;
+            let mut xs = x.clone();
             for _ in 0..NUM_LAYERS {
                 xs = model.forward(&xs)?;
             }
@@ -121,7 +128,7 @@ fn main() -> anyhow::Result<()> {
             Ok(())
         },
         &device,
-        [("inputs", inputs.clone())].into(),
+        Inputs { x: inputs },
     )?;
 
     graph.output_dot("out.png", GraphDumpFormat::Png, GraphDumpVerbosity::Verbose)?;
@@ -132,7 +139,7 @@ fn main() -> anyhow::Result<()> {
     let start = Instant::now();
     for i in 0..BENCH_N {
         let new = Tensor::full(i as f32, (1, 1, HIDDEN_SZ), &device)?.to_dtype(DType::BF16)?;
-        graph.replay([("inputs", &new)].into())?;
+        graph.replay(Inputs { x: new })?;
         graph_outputs.push(y.as_ref().unwrap().copy()?);
     }
     let graph_duration = Instant::now().duration_since(start);
