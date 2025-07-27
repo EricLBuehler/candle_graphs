@@ -1,13 +1,16 @@
 use anyhow::Context;
 use candle_core::{
     backend::BackendStorage,
-    cuda::cudarc::driver::{
-        self,
-        sys::{
-            CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUgraphNode,
-            CUstream, CUstreamCaptureMode,
+    cuda::{
+        cudarc::driver::{
+            self,
+            sys::{
+                CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUgraphNode,
+                CUstream, CUstreamCaptureMode,
+            },
+            DevicePtr,
         },
-        DevicePtr,
+        CudaDType,
     },
     quantized::{GgmlDType, QMatMul, QTensor},
     DType, Device, Storage, Tensor,
@@ -32,6 +35,16 @@ use crate::{KernelLaunchParams, Node, NodeData};
 /// # Safety
 /// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
 pub unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyhow::Result<()> {
+    anyhow::ensure!(src.dtype() == dst.dtype(), "DTypes must match!");
+    anyhow::ensure!(
+        src.device().location() == dst.device().location(),
+        "Devices must match!"
+    );
+    anyhow::ensure!(
+        device.location() == dst.device().location(),
+        "Devices must match!"
+    );
+
     match (&*src.storage_and_layout().0, &*dst.storage_and_layout().0) {
         (Storage::Cuda(src), Storage::Cuda(tgt)) => {
             // What we are really doing:
@@ -44,72 +57,31 @@ pub unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyho
             // let dst = unsafe { cast_to_mut(tgt.as_cuda_slice::<bf16>()?) };
             // cu_device.dtod_copy(src, dst)?;
 
-            anyhow::ensure!(src.dtype() == dst.dtype(), "DTypes must match!");
+            fn memcpy_dtod<T: candle_core::WithDType + CudaDType>(
+                tgt: &candle_core::cuda::CudaStorage,
+                src: &candle_core::cuda::CudaStorage,
+            ) -> anyhow::Result<()> {
+                let tgt = tgt.as_cuda_slice::<T>()?;
+                let src = src.as_cuda_slice::<T>()?;
+                let num_bytes = src.num_bytes();
+                let stream = tgt.stream();
+
+                let (tgt, _tgt_guard) = tgt.device_ptr(stream);
+                let (src, _src_guard) = src.device_ptr(stream);
+                unsafe {
+                    driver::result::memcpy_dtod_async(tgt, src, num_bytes, stream.cu_stream())?
+                };
+                Ok(())
+            }
 
             match src.dtype() {
-                DType::BF16 => {
-                    let tgt = tgt.as_cuda_slice::<bf16>()?;
-                    let src = src.as_cuda_slice::<bf16>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<bf16>(),
-                    )?;
-                }
-                DType::F16 => {
-                    let tgt = tgt.as_cuda_slice::<f16>()?;
-                    let src = src.as_cuda_slice::<f16>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f16>(),
-                    )?;
-                }
-                DType::F32 => {
-                    let tgt = tgt.as_cuda_slice::<f32>()?;
-                    let src = src.as_cuda_slice::<f32>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f32>(),
-                    )?;
-                }
-                DType::F64 => {
-                    let tgt = tgt.as_cuda_slice::<f64>()?;
-                    let src = src.as_cuda_slice::<f64>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f64>(),
-                    )?;
-                }
-                DType::I64 => {
-                    let tgt = tgt.as_cuda_slice::<i64>()?;
-                    let src = src.as_cuda_slice::<i64>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<i64>(),
-                    )?;
-                }
-                DType::U32 => {
-                    let tgt = tgt.as_cuda_slice::<u32>()?;
-                    let src = src.as_cuda_slice::<u32>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<u32>(),
-                    )?;
-                }
-                DType::U8 => {
-                    let tgt = tgt.as_cuda_slice::<u8>()?;
-                    let src = src.as_cuda_slice::<u8>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<u8>(),
-                    )?;
-                }
+                DType::BF16 => memcpy_dtod::<bf16>(tgt, src)?,
+                DType::F16 => memcpy_dtod::<f16>(tgt, src)?,
+                DType::F32 => memcpy_dtod::<f32>(tgt, src)?,
+                DType::F64 => memcpy_dtod::<f64>(tgt, src)?,
+                DType::I64 => memcpy_dtod::<i64>(tgt, src)?,
+                DType::U32 => memcpy_dtod::<u32>(tgt, src)?,
+                DType::U8 => memcpy_dtod::<u8>(tgt, src)?,
             }
             device.synchronize()?;
         }
