@@ -7,7 +7,7 @@ use candle_core::{
             CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUgraphNode,
             CUstream, CUstreamCaptureMode,
         },
-        DevicePtr, DeviceSlice,
+        DevicePtr,
     },
     quantized::{GgmlDType, QMatMul, QTensor},
     DType, Device, Storage, Tensor,
@@ -25,7 +25,7 @@ use std::{
     ptr,
 };
 
-use crate::{KernelLaunchParams, Node, NodeData, COPY2D_FINGERPRINT};
+use crate::{KernelLaunchParams, Node, NodeData};
 
 /// Copy a tensor inplace from src to dst. This can be used to implement `GraphInput`.
 ///
@@ -360,7 +360,9 @@ impl<T: GraphInput> Graph<T> {
             .arg(format!("-T{ty}"))
             .arg(tmp)
             .output()
-            .context("The graphviz utility is required to be installed: https://graphviz.org/download/")?
+            .context(
+                "The graphviz utility is required to be installed: https://graphviz.org/download/",
+            )?
             .stdout;
         std::fs::write(out, command)?;
         Ok(())
@@ -405,12 +407,6 @@ impl<T: GraphInput> Graph<T> {
                         node_params.assume_init()
                     };
                     let vec = unsafe { std::slice::from_raw_parts(node_params.kernelParams, 1) };
-                    for item in vec {
-                        let arg_ptr = *item as *const u64;
-                        if unsafe { *arg_ptr } == COPY2D_FINGERPRINT {
-                            println!("found it ");
-                        }
-                    }
                     let params = KernelLaunchParams {
                         grid_dim_x: node_params.gridDimX,
                         grid_dim_y: node_params.gridDimY,
