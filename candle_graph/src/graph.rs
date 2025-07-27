@@ -1,13 +1,13 @@
 use anyhow::Context;
 use candle_core::{
     backend::BackendStorage,
-    cuda::cudarc::driver::{
-        self,
-        sys::{
-            CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphInstantiate_flags, CUgraphNode,
-            CUstream, CUstreamCaptureMode,
+    cuda::{
+        cudarc::driver::{
+            self, result,
+            sys::{self, CUgraph, CUgraphDebugDot_flags, CUgraphExec, CUgraphNode},
+            CudaStream, DevicePtr, DriverError,
         },
-        DevicePtr, DeviceSlice,
+        CudaDType,
     },
     quantized::{GgmlDType, QMatMul, QTensor},
     DType, Device, Storage, Tensor,
@@ -23,15 +23,26 @@ use std::{
     path::Path,
     process::Command,
     ptr,
+    sync::Arc,
 };
 
-use crate::{KernelLaunchParams, Node, NodeData, COPY2D_FINGERPRINT};
+use crate::{KernelLaunchParams, Node, NodeData};
 
 /// Copy a tensor inplace from src to dst. This can be used to implement `GraphInput`.
 ///
 /// # Safety
 /// It must be ensured that the storage of src can be cast to &mut. So no aliasing across threads.
 pub unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyhow::Result<()> {
+    anyhow::ensure!(src.dtype() == dst.dtype(), "DTypes must match!");
+    anyhow::ensure!(
+        src.device().location() == dst.device().location(),
+        "Devices must match!"
+    );
+    anyhow::ensure!(
+        device.location() == dst.device().location(),
+        "Devices must match!"
+    );
+
     match (&*src.storage_and_layout().0, &*dst.storage_and_layout().0) {
         (Storage::Cuda(src), Storage::Cuda(tgt)) => {
             // What we are really doing:
@@ -44,72 +55,31 @@ pub unsafe fn copy_inplace(src: &Tensor, dst: &Tensor, device: &Device) -> anyho
             // let dst = unsafe { cast_to_mut(tgt.as_cuda_slice::<bf16>()?) };
             // cu_device.dtod_copy(src, dst)?;
 
-            anyhow::ensure!(src.dtype() == dst.dtype(), "DTypes must match!");
+            fn memcpy_dtod<T: candle_core::WithDType + CudaDType>(
+                tgt: &candle_core::cuda::CudaStorage,
+                src: &candle_core::cuda::CudaStorage,
+            ) -> anyhow::Result<()> {
+                let tgt = tgt.as_cuda_slice::<T>()?;
+                let src = src.as_cuda_slice::<T>()?;
+                let num_bytes = src.num_bytes();
+                let stream = tgt.stream();
+
+                let (tgt, _tgt_guard) = tgt.device_ptr(stream);
+                let (src, _src_guard) = src.device_ptr(stream);
+                unsafe {
+                    driver::result::memcpy_dtod_async(tgt, src, num_bytes, stream.cu_stream())?
+                };
+                Ok(())
+            }
 
             match src.dtype() {
-                DType::BF16 => {
-                    let tgt = tgt.as_cuda_slice::<bf16>()?;
-                    let src = src.as_cuda_slice::<bf16>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<bf16>(),
-                    )?;
-                }
-                DType::F16 => {
-                    let tgt = tgt.as_cuda_slice::<f16>()?;
-                    let src = src.as_cuda_slice::<f16>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f16>(),
-                    )?;
-                }
-                DType::F32 => {
-                    let tgt = tgt.as_cuda_slice::<f32>()?;
-                    let src = src.as_cuda_slice::<f32>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f32>(),
-                    )?;
-                }
-                DType::F64 => {
-                    let tgt = tgt.as_cuda_slice::<f64>()?;
-                    let src = src.as_cuda_slice::<f64>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<f64>(),
-                    )?;
-                }
-                DType::I64 => {
-                    let tgt = tgt.as_cuda_slice::<i64>()?;
-                    let src = src.as_cuda_slice::<i64>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<i64>(),
-                    )?;
-                }
-                DType::U32 => {
-                    let tgt = tgt.as_cuda_slice::<u32>()?;
-                    let src = src.as_cuda_slice::<u32>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<u32>(),
-                    )?;
-                }
-                DType::U8 => {
-                    let tgt = tgt.as_cuda_slice::<u8>()?;
-                    let src = src.as_cuda_slice::<u8>()?;
-                    driver::result::memcpy_dtod_sync(
-                        *tgt.device_ptr(),
-                        *src.device_ptr(),
-                        src.len() * std::mem::size_of::<u8>(),
-                    )?;
-                }
+                DType::BF16 => memcpy_dtod::<bf16>(tgt, src)?,
+                DType::F16 => memcpy_dtod::<f16>(tgt, src)?,
+                DType::F32 => memcpy_dtod::<f32>(tgt, src)?,
+                DType::F64 => memcpy_dtod::<f64>(tgt, src)?,
+                DType::I64 => memcpy_dtod::<i64>(tgt, src)?,
+                DType::U32 => memcpy_dtod::<u32>(tgt, src)?,
+                DType::U8 => memcpy_dtod::<u8>(tgt, src)?,
             }
             device.synchronize()?;
         }
@@ -165,10 +135,41 @@ impl GraphInput for HashMap<&'static str, Tensor> {
     }
 }
 
+/// See [cuda docs](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__STREAM.html#group__CUDA__STREAM_1g767167da0bbf07157dc20b6c258a2143)
+fn begin_capture(
+    stream: &Arc<CudaStream>,
+    mode: sys::CUstreamCaptureMode,
+) -> Result<(), DriverError> {
+    stream.context().bind_to_thread()?;
+    unsafe { result::stream::begin_capture(stream.cu_stream(), mode) }
+}
+
+/// See [cuda docs](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__STREAM.html#group__CUDA__STREAM_1g03dab8b2ba76b00718955177a929970c)
+///
+/// `flags` is passed to [cuGraphInstantiate](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__GRAPH.html#group__CUDA__GRAPH_1gb53b435e178cccfa37ac87285d2c3fa1)
+pub fn end_capture(
+    stream: &Arc<CudaStream>,
+    flags: sys::CUgraphInstantiate_flags,
+) -> Result<Option<(CUgraph, CUgraphExec)>, DriverError> {
+    stream.context().bind_to_thread()?;
+    let cu_graph = unsafe { result::stream::end_capture(stream.cu_stream()) }?;
+    if cu_graph.is_null() {
+        return Ok(None);
+    }
+    let cu_graph_exec = unsafe { result::graph::instantiate(cu_graph, flags) }?;
+    Ok(Some((cu_graph, cu_graph_exec)))
+}
+
+/// See [cuda docs](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__GRAPH.html#group__CUDA__GRAPH_1g6b2dceb3901e71a390d2bd8b0491e471)
+fn launch(stream: &Arc<CudaStream>, cu_graph_exec: CUgraphExec) -> Result<(), DriverError> {
+    stream.context().bind_to_thread()?;
+    unsafe { result::graph::launch(cu_graph_exec, stream.cu_stream()) }
+}
+
 pub struct Graph<T: GraphInput> {
-    graph: CUgraph,
-    exec: CUgraphExec,
-    stream: CUstream,
+    cu_graph: sys::CUgraph,
+    cu_graph_exec: sys::CUgraphExec,
+    stream: Arc<CudaStream>,
     device: Device,
     input: T,
     ran_graph: Cell<bool>,
@@ -190,7 +191,7 @@ impl<T: GraphInput> Graph<T> {
             _ => anyhow::bail!("Must have CUDA device."),
         };
 
-        let cu_stream = cu_device.cu_stream();
+        let stream = cu_device.cuda_stream();
 
         // Initialize all ptx files
         // `load_ptx` cannot be called while capturing the stream so we need this to happen
@@ -251,46 +252,18 @@ impl<T: GraphInput> Graph<T> {
             device.synchronize()?;
         }
 
-        let mut cu_graph: CUgraph = unsafe {
-            let mut cu_graph = MaybeUninit::uninit();
-            driver::sys::lib()
-                .cuGraphCreate(cu_graph.as_mut_ptr(), 0)
-                .result()?;
-            cu_graph.assume_init()
-        };
-
-        unsafe {
-            driver::sys::lib()
-                .cuStreamBeginCapture_v2(
-                    *cu_stream,
-                    CUstreamCaptureMode::CU_STREAM_CAPTURE_MODE_RELAXED,
-                )
-                .result()?
-        }
+        begin_capture(
+            &stream,
+            sys::CUstreamCaptureMode::CU_STREAM_CAPTURE_MODE_RELAXED,
+        )?;
 
         from_code(&input)?;
 
-        /////  END CAPTURE AND WRITE TO THE GRAPH
-        unsafe {
-            driver::sys::lib()
-                .cuStreamEndCapture(*cu_stream, &mut cu_graph as *mut _)
-                .result()?;
-        }
-
-        /////  CREATING THE GRAPH EXECUTOR
-        let cu_graph_e: CUgraphExec = unsafe {
-            let mut cu_graph_e = MaybeUninit::uninit();
-            // https://github.com/pytorch/pytorch/blob/c7b0d4b148cf2e4e68f14193549945e1639bff40/aten/src/ATen/cuda/CUDAGraph.cpp#L166-L176
-            driver::sys::lib()
-                .cuGraphInstantiateWithFlags(
-                    cu_graph_e.as_mut_ptr(),
-                    cu_graph,
-                    CUgraphInstantiate_flags::CUDA_GRAPH_INSTANTIATE_FLAG_AUTO_FREE_ON_LAUNCH
-                        as u64,
-                )
-                .result()?;
-            cu_graph_e.assume_init()
-        };
+        let (graph, graph_exec) = end_capture(
+            &stream,
+            sys::CUgraphInstantiate_flags::CUDA_GRAPH_INSTANTIATE_FLAG_AUTO_FREE_ON_LAUNCH,
+        )?
+        .context("`end_capture` failed.")?;
 
         for (name, input) in &input.to_inputs() {
             if !input.is_contiguous() {
@@ -299,9 +272,9 @@ impl<T: GraphInput> Graph<T> {
         }
 
         Ok(Self {
-            graph: cu_graph,
-            exec: cu_graph_e,
-            stream: *cu_stream,
+            cu_graph: graph,
+            cu_graph_exec: graph_exec,
+            stream,
             device: device.clone(),
             input,
             _marker: PhantomData,
@@ -319,11 +292,7 @@ impl<T: GraphInput> Graph<T> {
     /// - The inputs provided here must all be continuous
     pub fn replay(&self, input: T) -> anyhow::Result<()> {
         self.input.load_inputs_inplace(input, &self.device)?;
-        unsafe {
-            driver::sys::lib()
-                .cuGraphLaunch(self.exec, self.stream)
-                .result()?
-        }
+        launch(&self.stream, self.cu_graph_exec)?;
         self.ran_graph.set(true);
         self.device.synchronize()?;
         Ok(())
@@ -349,8 +318,7 @@ impl<T: GraphInput> Graph<T> {
             }
             GraphDumpVerbosity::Clean => 0,
         };
-        unsafe { driver::sys::lib().cuGraphDebugDotPrint(self.graph, cstr.as_ptr(), verbosity) }
-            .result()?;
+        unsafe { sys::cuGraphDebugDotPrint(self.cu_graph, cstr.as_ptr(), verbosity) }.result()?;
         let ty = match format {
             GraphDumpFormat::Png => "png",
             GraphDumpFormat::Svg => "svg",
@@ -360,7 +328,9 @@ impl<T: GraphInput> Graph<T> {
             .arg(format!("-T{ty}"))
             .arg(tmp)
             .output()
-            .context("`candle_graph` requires the graphviz utility to be installed: https://graphviz.org/download/")?
+            .context(
+                "The graphviz utility is required to be installed: https://graphviz.org/download/",
+            )?
             .stdout;
         std::fs::write(out, command)?;
         Ok(())
@@ -371,15 +341,13 @@ impl<T: GraphInput> Graph<T> {
         println!("Getting nodes");
         let mut num_nodes = unsafe {
             let mut num_nodes = MaybeUninit::uninit();
-            driver::sys::lib()
-                .cuGraphGetNodes(self.graph, ptr::null_mut(), num_nodes.as_mut_ptr())
+            sys::cuGraphGetNodes(self.cu_graph, ptr::null_mut(), num_nodes.as_mut_ptr())
                 .result()?;
             num_nodes.assume_init()
         };
         let node_ptrs = unsafe {
             let mut nodes: Vec<CUgraphNode> = Vec::with_capacity(num_nodes);
-            driver::sys::lib()
-                .cuGraphGetNodes(self.graph, nodes.as_mut_ptr(), &mut num_nodes as *mut _)
+            sys::cuGraphGetNodes(self.cu_graph, nodes.as_mut_ptr(), &mut num_nodes as *mut _)
                 .result()?;
             nodes.set_len(num_nodes);
             nodes
@@ -389,9 +357,7 @@ impl<T: GraphInput> Graph<T> {
         for node in &node_ptrs {
             let node_type = unsafe {
                 let mut node_type = MaybeUninit::uninit();
-                driver::sys::lib()
-                    .cuGraphNodeGetType(*node, node_type.as_mut_ptr())
-                    .result()?;
+                sys::cuGraphNodeGetType(*node, node_type.as_mut_ptr()).result()?;
                 node_type.assume_init()
             };
             #[allow(clippy::single_match)]
@@ -399,18 +365,10 @@ impl<T: GraphInput> Graph<T> {
                 driver::sys::CUgraphNodeType::CU_GRAPH_NODE_TYPE_KERNEL => {
                     let node_params = unsafe {
                         let mut node_params = MaybeUninit::uninit();
-                        driver::sys::lib()
-                            .cuGraphKernelNodeGetParams_v2(*node, node_params.as_mut_ptr())
+                        sys::cuGraphKernelNodeGetParams_v2(*node, node_params.as_mut_ptr())
                             .result()?;
                         node_params.assume_init()
                     };
-                    let vec = unsafe { std::slice::from_raw_parts(node_params.kernelParams, 1) };
-                    for item in vec {
-                        let arg_ptr = *item as *const u64;
-                        if unsafe { *arg_ptr } == COPY2D_FINGERPRINT {
-                            println!("found it ");
-                        }
-                    }
                     let params = KernelLaunchParams {
                         grid_dim_x: node_params.gridDimX,
                         grid_dim_y: node_params.gridDimY,
@@ -463,22 +421,16 @@ impl<T: GraphInput> Graph<T> {
 
 impl<T: GraphInput> Drop for Graph<T> {
     fn drop(&mut self) {
-        if !self.ran_graph.get() {
-            unsafe {
-                driver::sys::lib()
-                    .cuGraphLaunch(self.exec, self.stream)
-                    .result()
-                    .expect("Graph was not run, final run failed")
-            }
-            self.device
-                .synchronize()
-                .expect("Graph was not run, device sync failed")
+        let ctx = self.stream.context();
+
+        let cu_graph_exec = std::mem::replace(&mut self.cu_graph_exec, std::ptr::null_mut());
+        if !cu_graph_exec.is_null() {
+            ctx.record_err(unsafe { result::graph::exec_destroy(cu_graph_exec) });
         }
-        unsafe { driver::sys::lib().cuGraphDestroy(self.graph) }
-            .result()
-            .expect("Graph destroy failed");
-        unsafe { driver::sys::lib().cuGraphExecDestroy(self.exec) }
-            .result()
-            .expect("Graph destroy failed");
+
+        let cu_graph = std::mem::replace(&mut self.cu_graph, std::ptr::null_mut());
+        if !cu_graph.is_null() {
+            ctx.record_err(unsafe { result::graph::destroy(cu_graph) });
+        }
     }
 }
