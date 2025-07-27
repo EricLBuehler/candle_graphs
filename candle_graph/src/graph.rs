@@ -360,7 +360,7 @@ impl<T: GraphInput> Graph<T> {
             .arg(format!("-T{ty}"))
             .arg(tmp)
             .output()
-            .context("`candle_graph` requires the graphviz utility to be installed: https://graphviz.org/download/")?
+            .context("The graphviz utility is required to be installed: https://graphviz.org/download/")?
             .stdout;
         std::fs::write(out, command)?;
         Ok(())
