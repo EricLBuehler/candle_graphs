@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, mem::MaybeUninit, ops::Deref};
 
-use candle_core::cuda::cudarc::driver::{self, sys::CUgraphNode};
+use candle_core::cuda::cudarc::driver::sys::{self, CUgraphNode};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct KernelLaunchParams {
@@ -68,8 +68,7 @@ impl Node<'_> {
                 *tgt = launch_params;
                 let mut node_params = unsafe {
                     let mut node_params = MaybeUninit::uninit();
-                    driver::sys::lib()
-                        .cuGraphKernelNodeGetParams_v2(self.inner, node_params.as_mut_ptr())
+                    sys::cuGraphKernelNodeGetParams_v2(self.inner, node_params.as_mut_ptr())
                         .result()?;
                     node_params.assume_init()
                 };
@@ -81,8 +80,7 @@ impl Node<'_> {
                 node_params.blockDimZ = tgt.block_dim_z;
                 node_params.sharedMemBytes = tgt.shared_mem_bytes;
                 unsafe {
-                    driver::sys::lib()
-                        .cuGraphKernelNodeSetParams_v2(self.inner, &node_params as *const _)
+                    sys::cuGraphKernelNodeSetParams_v2(self.inner, &node_params as *const _)
                         .result()?;
                 }
             }
